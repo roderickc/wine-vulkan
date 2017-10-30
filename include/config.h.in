@@ -1541,6 +1541,9 @@
 /* Define to the soname of the libXxf86vm library. */
 #undef SONAME_LIBXXF86VM
 
+/* Define to the soname of the libvulkan library. */
+#undef SONAME_LIBVULKAN
+
 /* Define to 1 if the `S_IS*' macros in <sys/stat.h> do not work properly. */
 #undef STAT_MACROS_BROKEN
 

@@ -26,6 +26,7 @@
 #include "wine/debug.h"
 #include "wine/vulkan.h"
 #include "wine/vulkan_driver.h"
+#include "vulkan_private.h"
 
 WINE_DEFAULT_DEBUG_CHANNEL(vulkan);
 
@@ -55,6 +56,19 @@ const struct vulkan_func vk_global_dispatch_table[] = {
 };
 
 static struct vulkan_funcs *vk_funcs = NULL;
+
+static void *wine_vk_alloc_dispatchable_object(size_t size)
+{
+    struct wine_vk_dispatchable_object *object = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, size);
+
+    if (!object)
+        return NULL;
+
+    /* Set special header for ICD loader. */
+    ((struct wine_vk_base*)object)->loader_magic = VULKAN_ICD_MAGIC_VALUE;
+
+    return object;
+}
 
 static void *wine_vk_get_global_proc_addr(const char *name)
 {
@@ -87,11 +101,55 @@ static BOOL wine_vk_init(HINSTANCE hinst)
     return TRUE;
 }
 
+/* Helper function used for freeing an instance structure. This function supports full
+ * and partial object cleanups and can thus be used for vkCreateInstance failures.
+ */
+static void wine_vk_instance_free(struct VkInstance_T *instance)
+{
+    if (!instance)
+        return;
+
+    if (instance->instance)
+        vk_funcs->p_vkDestroyInstance(instance->instance, NULL /* pAllocator */);
+
+    HeapFree(GetProcessHeap(), 0, instance);
+}
+
 static VkResult WINAPI wine_vkCreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
         VkInstance *pInstance)
 {
-    TRACE("%p %p %p\n", pCreateInfo, pAllocator, pInstance);
-    return vk_funcs->p_vkCreateInstance(pCreateInfo, pAllocator, pInstance);
+    VkInstance instance = NULL;
+    VkResult res;
+
+    TRACE("pCreateInfo %p, pAllocater %p, pInstance %p\n", pCreateInfo, pAllocator, pInstance);
+
+    if (pAllocator)
+        FIXME("Support for allocation callbacks not implemented yet\n");
+
+    instance = wine_vk_alloc_dispatchable_object(sizeof(*instance));
+    if (!instance)
+    {
+        ERR("Failed to allocate memory for instance\n");
+        res = VK_ERROR_OUT_OF_HOST_MEMORY;
+        goto err;
+    }
+
+    res = vk_funcs->p_vkCreateInstance(pCreateInfo, NULL /* pAllocator */, &instance->instance);
+    if (res != VK_SUCCESS)
+    {
+        ERR("Failed to create instance, res=%d\n", res);
+        goto err;
+    }
+
+    *pInstance = instance;
+    TRACE("Done, instance=%p native_instance=%p\n", instance, instance->instance);
+    return VK_SUCCESS;
+
+err:
+    if (instance)
+        wine_vk_instance_free(instance);
+
+    return res;
 }
 
 static VkResult WINAPI wine_vkEnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pPropertyCount,
