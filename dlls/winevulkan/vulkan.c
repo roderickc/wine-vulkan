@@ -21,9 +21,11 @@
 
 #include "windef.h"
 #include "winbase.h"
+#include "winuser.h"
 
 #include "wine/debug.h"
 #include "wine/vulkan.h"
+#include "wine/vulkan_driver.h"
 
 WINE_DEFAULT_DEBUG_CHANNEL(vulkan);
 
@@ -52,6 +54,8 @@ const struct vulkan_func vk_global_dispatch_table[] = {
     {"vkGetInstanceProcAddr", &wine_vkGetInstanceProcAddr},
 };
 
+static struct vulkan_funcs *vk_funcs = NULL;
+
 static void *wine_vk_get_global_proc_addr(const char *name)
 {
     int i;
@@ -64,6 +68,23 @@ static void *wine_vk_get_global_proc_addr(const char *name)
         }
     }
     return NULL;
+}
+
+static BOOL wine_vk_init(HINSTANCE hinst)
+{
+    HDC hdc = GetDC(0);
+
+    vk_funcs =  __wine_get_vulkan_driver(hdc, WINE_VULKAN_DRIVER_VERSION);
+    if (!vk_funcs)
+    {
+        ReleaseDC(0, hdc);
+        return FALSE;
+    }
+
+    DisableThreadLibraryCalls(hinst);
+
+    ReleaseDC(0, hdc);
+    return TRUE;
 }
 
 static VkResult WINAPI wine_vkCreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
@@ -138,8 +159,7 @@ BOOL WINAPI DllMain(HINSTANCE hinst, DWORD reason, LPVOID reserved)
     switch(reason)
     {
         case DLL_PROCESS_ATTACH:
-            DisableThreadLibraryCalls(hinst);
-            break;
+            return wine_vk_init(hinst);
 
         case DLL_THREAD_ATTACH:
             break;
