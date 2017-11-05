@@ -27,6 +27,13 @@
 
 WINE_DEFAULT_DEBUG_CHANNEL(vulkan);
 
+/* For now default to 3 as it felt like a reasonable version feature wise to support.
+ * Version 4 requires us to implement vk_icdGetPhysicalDeviceProcAddr, which I didn't
+ * want to deal with just yet. It also added some more detailed API version check
+ * requirements. Version 5 builds further on this. Something to tackle later.
+ */
+#define WINE_VULKAN_ICD_VERSION 3
+
 void * WINAPI wine_vk_icdGetInstanceProcAddr(VkInstance instance, const char *pName)
 {
     FIXME("stub: %p %s\n", instance, debugstr_a(pName));
@@ -35,8 +42,20 @@ void * WINAPI wine_vk_icdGetInstanceProcAddr(VkInstance instance, const char *pN
 
 VkResult WINAPI wine_vk_icdNegotiateLoaderICDInterfaceVersion(uint32_t *pSupportedVersion)
 {
-    FIXME("stub: %p\n", pSupportedVersion);
-    return VK_ERROR_INCOMPATIBLE_DRIVER;
+    uint32_t req_version;
+    TRACE("%p\n", pSupportedVersion);
+
+    /* The spec is not clear how to handle this. Mesa drivers don't check, but it
+     * is probably best to not explode. VK_INCOMPLETE seems to be the closest value.
+     */
+    if (!pSupportedVersion)
+        return VK_INCOMPLETE;
+
+    req_version = *pSupportedVersion;
+    *pSupportedVersion = min(req_version, WINE_VULKAN_ICD_VERSION);
+    TRACE("Loader requested ICD version=%d, returning %d\n", req_version, *pSupportedVersion);
+
+    return VK_SUCCESS;
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinst, DWORD reason, LPVOID reserved)
