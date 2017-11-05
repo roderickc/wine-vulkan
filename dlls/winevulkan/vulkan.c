@@ -34,10 +34,85 @@ WINE_DEFAULT_DEBUG_CHANNEL(vulkan);
  */
 #define WINE_VULKAN_ICD_VERSION 3
 
+static VkResult WINAPI wine_vkCreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
+        VkInstance *pInstance);
+static VkResult WINAPI wine_vkEnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pPropertyCount,
+        VkExtensionProperties* pProperties);
+static PFN_vkVoidFunction WINAPI wine_vkGetInstanceProcAddr(VkInstance instance, const char* pName);
+
+struct vulkan_func
+{
+    const char *name;
+    void *func;
+};
+
+const struct vulkan_func vk_global_dispatch_table[] = {
+    {"vkCreateInstance", &wine_vkCreateInstance},
+    {"vkEnumerateInstanceExtensionProperties", &wine_vkEnumerateInstanceExtensionProperties},
+    {"vkGetInstanceProcAddr", &wine_vkGetInstanceProcAddr},
+};
+
+static void *wine_vk_get_global_proc_addr(const char *name)
+{
+    int i;
+    for (i = 0; i < sizeof(vk_global_dispatch_table) / sizeof(vk_global_dispatch_table[0]); i++)
+    {
+        if (strcmp(name, vk_global_dispatch_table[i].name) == 0)
+        {
+            TRACE("Found pName=%s in global table\n", name);
+            return vk_global_dispatch_table[i].func;
+        }
+    }
+    return NULL;
+}
+
+static VkResult WINAPI wine_vkCreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
+        VkInstance *pInstance)
+{
+    FIXME("stub: %p %p %p\n", pCreateInfo, pAllocator, pInstance);
+    return VK_ERROR_INCOMPATIBLE_DRIVER;
+}
+
+static VkResult WINAPI wine_vkEnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pPropertyCount,
+        VkExtensionProperties *pProperties)
+{
+    FIXME("stub: %p %p %p\n", pLayerName, pPropertyCount, pProperties);
+    return VK_ERROR_OUT_OF_HOST_MEMORY;
+}
+
+static PFN_vkVoidFunction WINAPI wine_vkGetInstanceProcAddr(VkInstance instance, const char *pName)
+{
+    void *func;
+    TRACE("%p %s\n", instance, debugstr_a(pName));
+
+    /* vkGetInstanceProcAddr can load most Vulkan functions when an instance is passed in, however
+     * for a NULL instance it can only load global functions.
+     */
+    func = wine_vk_get_global_proc_addr(pName);
+    if (func)
+    {
+        return func;
+    }
+    else if (!instance && !func)
+    {
+        FIXME("Global function '%s' not found\n", pName);
+        return NULL;
+    }
+
+    FIXME("Unsupported device or instance function: '%s'\n", pName);
+    return NULL;
+}
+
 void * WINAPI wine_vk_icdGetInstanceProcAddr(VkInstance instance, const char *pName)
 {
-    FIXME("stub: %p %s\n", instance, debugstr_a(pName));
-    return NULL;
+    TRACE("%p %s\n", instance, debugstr_a(pName));
+
+    /* Initial version of the Vulkan ICD spec required vkGetInstanceProcAddr to be
+     * exported. vk_icdGetInstanceProcAddr was added later to separete ICD calls from
+     * Vulkan API. One of them in our case should forward to the other, so just forward
+     * to the older vkGetInstanceProcAddr.
+     */
+    return wine_vkGetInstanceProcAddr(instance, pName);
 }
 
 VkResult WINAPI wine_vk_icdNegotiateLoaderICDInterfaceVersion(uint32_t *pSupportedVersion)
