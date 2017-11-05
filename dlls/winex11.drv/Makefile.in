@@ -28,6 +28,7 @@ C_SRCS = \
 	xinerama.c \
 	xrandr.c \
 	xrender.c \
-	xvidmode.c
+	xvidmode.c \
+	vulkan.c
 
 RC_SRCS = version.rc

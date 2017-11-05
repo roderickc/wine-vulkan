@@ -1,0 +1,70 @@
+/* X11DRV Vulkan implementation
+ *
+ * Copyright 2017 Roderick Colenbrander
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA
+ */
+
+#include "config.h"
+#include "wine/port.h"
+
+#include "wine/debug.h"
+#include "wine/vulkan.h"
+#include "wine/vulkan_driver.h"
+
+WINE_DEFAULT_DEBUG_CHANNEL(vulkan);
+
+static VkResult X11DRV_vkCreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
+        VkInstance *pInstance)
+{
+    FIXME("stub: %p %p %p\n", pCreateInfo, pAllocator, pInstance);
+    return VK_ERROR_INCOMPATIBLE_DRIVER;
+}
+
+static void X11DRV_vkDestroyInstance(VkInstance instance, const VkAllocationCallbacks *pAllocator)
+{
+    FIXME("stub: %p %p\n", instance, pAllocator);
+}
+
+static VkResult X11DRV_vkEnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pPropertyCount,
+        VkExtensionProperties* pProperties)
+{
+    FIXME("stub: %s %p %p\n", debugstr_a(pLayerName), pPropertyCount, pProperties);
+    return VK_ERROR_OUT_OF_HOST_MEMORY;
+}
+
+static void * X11DRV_vkGetInstanceProcAddr(VkInstance instance, const char *pName)
+{
+    FIXME("stub: %p, %s\n", instance, debugstr_a(pName));
+    return NULL;
+}
+
+static struct vulkan_funcs vulkan_funcs = {
+    X11DRV_vkCreateInstance,
+    X11DRV_vkDestroyInstance,
+    X11DRV_vkEnumerateInstanceExtensionProperties,
+    X11DRV_vkGetInstanceProcAddr
+};
+
+struct vulkan_funcs *get_vulkan_driver(UINT version)
+{
+    if (version != WINE_VULKAN_DRIVER_VERSION)
+    {
+        ERR("version mismatch, vulkan wants %u but driver has %u\n", version, WINE_VULKAN_DRIVER_VERSION);
+        return NULL;
+    }
+
+    return &vulkan_funcs;
+}
