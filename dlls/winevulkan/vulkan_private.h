@@ -23,6 +23,12 @@
 /* Magic value defined by Vulkan ICD / Loader spec */
 #define VULKAN_ICD_MAGIC_VALUE 0x01CDC0DE
 
+struct vulkan_func
+{
+    const char *name;
+    void *func;
+};
+
 /* Base 'class' for our Vulkan dispatchable objects such as VkDevice and VkInstance.
  * This structure MUST be the first element of a dispatchable object as the ICD
  * loader depends on it. For now only contains loader_magic, but over time more common

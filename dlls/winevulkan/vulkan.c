@@ -43,12 +43,6 @@ static VkResult WINAPI wine_vkEnumerateInstanceExtensionProperties(const char *p
         VkExtensionProperties* pProperties);
 static PFN_vkVoidFunction WINAPI wine_vkGetInstanceProcAddr(VkInstance instance, const char* pName);
 
-struct vulkan_func
-{
-    const char *name;
-    void *func;
-};
-
 const struct vulkan_func vk_global_dispatch_table[] = {
     {"vkCreateInstance", &wine_vkCreateInstance},
     {"vkEnumerateInstanceExtensionProperties", &wine_vkEnumerateInstanceExtensionProperties},
@@ -177,6 +171,9 @@ static PFN_vkVoidFunction WINAPI wine_vkGetInstanceProcAddr(VkInstance instance,
         FIXME("Global function '%s' not found\n", pName);
         return NULL;
     }
+
+    func = wine_vk_get_instance_proc_addr(pName);
+    if (func) return func;
 
     FIXME("Unsupported device or instance function: '%s'\n", pName);
     return NULL;
