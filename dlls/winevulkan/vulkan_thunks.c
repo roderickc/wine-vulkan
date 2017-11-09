@@ -18,50 +18,56 @@ static VkResult WINAPI wine_vkCreateDevice(VkPhysicalDevice physicalDevice, cons
 
 static VkResult WINAPI wine_vkEnumerateDeviceExtensionProperties(VkPhysicalDevice physicalDevice, const char *pLayerName, uint32_t *pPropertyCount, VkExtensionProperties *pProperties)
 {
-    FIXME("stub: %p, %p, %p, %p\n", physicalDevice, pLayerName, pPropertyCount, pProperties);
-    return VK_ERROR_OUT_OF_HOST_MEMORY;
+    TRACE("%p, %p, %p, %p\n", physicalDevice, pLayerName, pPropertyCount, pProperties);
+    return physicalDevice->instance->funcs.p_vkEnumerateDeviceExtensionProperties(physicalDevice->phys_dev, pLayerName, pPropertyCount, pProperties);
 }
 
 static VkResult WINAPI wine_vkEnumerateDeviceLayerProperties(VkPhysicalDevice physicalDevice, uint32_t *pPropertyCount, VkLayerProperties *pProperties)
 {
-    FIXME("stub: %p, %p, %p\n", physicalDevice, pPropertyCount, pProperties);
-    return VK_ERROR_OUT_OF_HOST_MEMORY;
+    TRACE("%p, %p, %p\n", physicalDevice, pPropertyCount, pProperties);
+    return physicalDevice->instance->funcs.p_vkEnumerateDeviceLayerProperties(physicalDevice->phys_dev, pPropertyCount, pProperties);
 }
 
 static void WINAPI wine_vkGetPhysicalDeviceFeatures(VkPhysicalDevice physicalDevice, VkPhysicalDeviceFeatures *pFeatures)
 {
-    FIXME("stub: %p, %p\n", physicalDevice, pFeatures);
+    TRACE("%p, %p\n", physicalDevice, pFeatures);
+    physicalDevice->instance->funcs.p_vkGetPhysicalDeviceFeatures(physicalDevice->phys_dev, pFeatures);
 }
 
 static void WINAPI wine_vkGetPhysicalDeviceFormatProperties(VkPhysicalDevice physicalDevice, VkFormat format, VkFormatProperties *pFormatProperties)
 {
-    FIXME("stub: %p, %d, %p\n", physicalDevice, format, pFormatProperties);
+    TRACE("%p, %d, %p\n", physicalDevice, format, pFormatProperties);
+    physicalDevice->instance->funcs.p_vkGetPhysicalDeviceFormatProperties(physicalDevice->phys_dev, format, pFormatProperties);
 }
 
 static VkResult WINAPI wine_vkGetPhysicalDeviceImageFormatProperties(VkPhysicalDevice physicalDevice, VkFormat format, VkImageType type, VkImageTiling tiling, VkImageUsageFlags usage, VkImageCreateFlags flags, VkImageFormatProperties *pImageFormatProperties)
 {
-    FIXME("stub: %p, %d, %d, %d, %#x, %#x, %p\n", physicalDevice, format, type, tiling, usage, flags, pImageFormatProperties);
-    return VK_ERROR_OUT_OF_HOST_MEMORY;
+    TRACE("%p, %d, %d, %d, %#x, %#x, %p\n", physicalDevice, format, type, tiling, usage, flags, pImageFormatProperties);
+    return physicalDevice->instance->funcs.p_vkGetPhysicalDeviceImageFormatProperties(physicalDevice->phys_dev, format, type, tiling, usage, flags, pImageFormatProperties);
 }
 
 static void WINAPI wine_vkGetPhysicalDeviceMemoryProperties(VkPhysicalDevice physicalDevice, VkPhysicalDeviceMemoryProperties *pMemoryProperties)
 {
-    FIXME("stub: %p, %p\n", physicalDevice, pMemoryProperties);
+    TRACE("%p, %p\n", physicalDevice, pMemoryProperties);
+    physicalDevice->instance->funcs.p_vkGetPhysicalDeviceMemoryProperties(physicalDevice->phys_dev, pMemoryProperties);
 }
 
 static void WINAPI wine_vkGetPhysicalDeviceProperties(VkPhysicalDevice physicalDevice, VkPhysicalDeviceProperties *pProperties)
 {
-    FIXME("stub: %p, %p\n", physicalDevice, pProperties);
+    TRACE("%p, %p\n", physicalDevice, pProperties);
+    physicalDevice->instance->funcs.p_vkGetPhysicalDeviceProperties(physicalDevice->phys_dev, pProperties);
 }
 
 static void WINAPI wine_vkGetPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice physicalDevice, uint32_t *pQueueFamilyPropertyCount, VkQueueFamilyProperties *pQueueFamilyProperties)
 {
-    FIXME("stub: %p, %p, %p\n", physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties);
+    TRACE("%p, %p, %p\n", physicalDevice, pQueueFamilyPropertyCount, pQueueFamilyProperties);
+    physicalDevice->instance->funcs.p_vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice->phys_dev, pQueueFamilyPropertyCount, pQueueFamilyProperties);
 }
 
 static void WINAPI wine_vkGetPhysicalDeviceSparseImageFormatProperties(VkPhysicalDevice physicalDevice, VkFormat format, VkImageType type, VkSampleCountFlagBits samples, VkImageUsageFlags usage, VkImageTiling tiling, uint32_t *pPropertyCount, VkSparseImageFormatProperties *pProperties)
 {
-    FIXME("stub: %p, %d, %d, %d, %#x, %d, %p, %p\n", physicalDevice, format, type, samples, usage, tiling, pPropertyCount, pProperties);
+    TRACE("%p, %d, %d, %d, %#x, %d, %p, %p\n", physicalDevice, format, type, samples, usage, tiling, pPropertyCount, pProperties);
+    physicalDevice->instance->funcs.p_vkGetPhysicalDeviceSparseImageFormatProperties(physicalDevice->phys_dev, format, type, samples, usage, tiling, pPropertyCount, pProperties);
 }
 
 static const struct vulkan_func vk_instance_dispatch_table[] = {
