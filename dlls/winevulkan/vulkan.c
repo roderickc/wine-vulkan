@@ -343,6 +343,10 @@ static PFN_vkVoidFunction WINAPI wine_vkGetInstanceProcAddr(VkInstance instance,
     func = wine_vk_get_instance_proc_addr(pName);
     if (func) return func;
 
+    /* vkGetInstanceProcAddr also loads any children of instance, so device functions as well. */
+    func = wine_vk_get_device_proc_addr(pName);
+    if (func) return func;
+
     FIXME("Unsupported device or instance function: '%s'\n", pName);
     return NULL;
 }
