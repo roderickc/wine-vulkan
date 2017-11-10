@@ -48,7 +48,22 @@ struct VkInstance_T
 {
     struct wine_vk_base base;
     struct vulkan_instance_funcs funcs;
+
+    /* We cache devices as we need to wrap them as they are
+     * dispatchable objects.
+     */
+    uint32_t num_phys_devs;
+    struct VkPhysicalDevice_T **phys_devs;
+    BOOL phys_devs_initialized;
+
     VkInstance instance; /* native instance */
+};
+
+struct VkPhysicalDevice_T
+{
+    struct wine_vk_base base;
+    struct VkInstance_T *instance; /* parent */
+    VkPhysicalDevice phys_dev; /* native physical device */
 };
 
 #endif /* __WINE_VULKAN_PRIVATE_H */
