@@ -135,6 +135,15 @@ static VkResult WINAPI wine_vkCreateInstance(const VkInstanceCreateInfo *pCreate
         goto err;
     }
 
+    /* Load all instance functions we are aware of. Note the loader takes care
+     * of any filtering for extensions which were not requested, but which the
+     * ICD may support.
+     */
+#define USE_VK_FUNC(name) \
+    instance->funcs.p_##name = (void*)vk_funcs->p_vkGetInstanceProcAddr(instance->instance, #name);
+    ALL_VK_INSTANCE_FUNCS()
+#undef USE_VK_FUNC
+
     *pInstance = instance;
     TRACE("Done, instance=%p native_instance=%p\n", instance, instance->instance);
     return VK_SUCCESS;

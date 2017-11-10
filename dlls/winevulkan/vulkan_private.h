@@ -20,6 +20,8 @@
 #ifndef __WINE_VULKAN_PRIVATE_H
 #define __WINE_VULKAN_PRIVATE_H
 
+#include "vulkan_thunks.h"
+
 /* Magic value defined by Vulkan ICD / Loader spec */
 #define VULKAN_ICD_MAGIC_VALUE 0x01CDC0DE
 
@@ -45,6 +47,7 @@ struct wine_vk_base
 struct VkInstance_T
 {
     struct wine_vk_base base;
+    struct vulkan_instance_funcs funcs;
     VkInstance instance; /* native instance */
 };
 
