@@ -64,6 +64,22 @@ static void *wine_vk_alloc_dispatchable_object(size_t size)
     return object;
 }
 
+/* Helper function used for freeing a device structure. This function supports full
+ * and partial object cleanups and can thus be used vkCreateDevice failures.
+ */
+static void wine_vk_device_free(struct VkDevice_T *device)
+{
+    if (!device)
+        return;
+
+    if (device->device && device->funcs.p_vkDestroyDevice)
+    {
+        device->funcs.p_vkDestroyDevice(device->device, NULL /* pAllocator */);
+    }
+
+    HeapFree(GetProcessHeap(), 0, device);
+}
+
 static void *wine_vk_get_global_proc_addr(const char *name)
 {
     int i;
@@ -199,6 +215,55 @@ static void wine_vk_instance_free(struct VkInstance_T *instance)
         vk_funcs->p_vkDestroyInstance(instance->instance, NULL /* pAllocator */);
 
     HeapFree(GetProcessHeap(), 0, instance);
+}
+
+VkResult WINAPI wine_vkCreateDevice(VkPhysicalDevice physicalDevice, const VkDeviceCreateInfo *pCreateInfo,
+        const VkAllocationCallbacks *pAllocator, VkDevice *pDevice)
+{
+    struct VkDevice_T *device = NULL;
+    VkResult res;
+
+    TRACE("%p %p %p %p\n", physicalDevice, pCreateInfo, pAllocator, pDevice);
+
+    if (pAllocator)
+    {
+        FIXME("Support for allocation callbacks not implemented yet\n");
+    }
+
+    device = wine_vk_alloc_dispatchable_object(sizeof(*device));
+    if (!device)
+        return VK_ERROR_OUT_OF_HOST_MEMORY;
+
+    /* At least for now we can directly pass pCreateInfo through. All extensions we report
+     * should be compatible. In addition the loader is supposed to santize values e.g. layers.
+     */
+    res = physicalDevice->instance->funcs.p_vkCreateDevice(physicalDevice->phys_dev, pCreateInfo, NULL /* pAllocator */,
+            &device->device);
+    if (res != VK_SUCCESS)
+    {
+        ERR("Failed to create device\n");
+        goto err;
+    }
+
+    device->phys_dev = physicalDevice;
+
+    /* Just load all function pointers we are aware off. The loader takes care of filtering.
+     * We use vkGetDeviceProcAddr as opposed to vkGetInstanceProcAddr for efficiency reasons
+     * as functions pass through fewer dispatch tables within the loader.
+     */
+#define USE_VK_FUNC(name) \
+    device->funcs.p_##name = (void*)vk_funcs->p_vkGetDeviceProcAddr(device->device, #name); \
+    if (device->funcs.p_##name == NULL) \
+        TRACE("Not found %s\n", #name);
+    ALL_VK_DEVICE_FUNCS()
+#undef USE_VK_FUNC
+
+    *pDevice = device;
+    return VK_SUCCESS;
+
+err:
+    wine_vk_device_free(device);
+    return res;
 }
 
 static VkResult WINAPI wine_vkCreateInstance(const VkInstanceCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator,
