@@ -386,6 +386,28 @@ VkResult WINAPI wine_vkEnumeratePhysicalDevices(VkInstance instance, uint32_t *p
     return res;
 }
 
+PFN_vkVoidFunction WINAPI wine_vkGetDeviceProcAddr(VkDevice device, const char *pName)
+{
+    void *func;
+    TRACE("%p, %s\n", device, debugstr_a(pName));
+
+    /* The spec leaves return value undefined for a NULL device, let's just return NULL. */
+    if (!device)
+        return NULL;
+
+    /* Per the spec, we are only supposed to return device functions as in functions
+     * for which the first parameter is vkDevice or a child of vkDevice like a
+     * vkCommanBuffer, vkQueue.
+     * Loader takes are of filtering of extensions which are enabled or not.
+     */
+    func = wine_vk_get_device_proc_addr(pName);
+    if (func)
+        return func;
+
+    TRACE("Function %s not found\n", pName);
+    return NULL;
+}
+
 static PFN_vkVoidFunction WINAPI wine_vkGetInstanceProcAddr(VkInstance instance, const char *pName)
 {
     void *func;
