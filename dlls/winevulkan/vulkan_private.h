@@ -49,6 +49,12 @@ struct VkDevice_T
     struct wine_vk_base base;
     struct vulkan_device_funcs funcs;
     struct VkPhysicalDevice_T *phys_dev; /* parent */
+
+    uint32_t max_queue_families;
+    struct VkQueue_T **queues;
+    /* Stores number of queues per queue family */
+    int *queue_count;
+
     VkDevice device; /* native device */
 };
 
@@ -72,6 +78,13 @@ struct VkPhysicalDevice_T
     struct wine_vk_base base;
     struct VkInstance_T *instance; /* parent */
     VkPhysicalDevice phys_dev; /* native physical device */
+};
+
+struct VkQueue_T
+{
+    struct wine_vk_base base;
+    VkDevice device; /* parent */
+    VkQueue queue; /* native queue */
 };
 
 #endif /* __WINE_VULKAN_PRIVATE_H */
