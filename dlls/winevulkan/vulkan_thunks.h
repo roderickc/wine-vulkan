@@ -144,7 +144,9 @@ struct vulkan_device_funcs
 struct vulkan_instance_funcs
 {
     VkResult (*p_vkCreateDevice)(VkPhysicalDevice, const VkDeviceCreateInfo *, const VkAllocationCallbacks *, VkDevice *);
+    VkResult (*p_vkCreateWin32SurfaceKHR)(VkInstance, const VkWin32SurfaceCreateInfoKHR *, const VkAllocationCallbacks *, VkSurfaceKHR *);
     void (*p_vkDestroyInstance)(VkInstance, const VkAllocationCallbacks *);
+    void (*p_vkDestroySurfaceKHR)(VkInstance, VkSurfaceKHR, const VkAllocationCallbacks *);
     VkResult (*p_vkEnumerateDeviceExtensionProperties)(VkPhysicalDevice, const char *, uint32_t *, VkExtensionProperties *);
     VkResult (*p_vkEnumerateDeviceLayerProperties)(VkPhysicalDevice, uint32_t *, VkLayerProperties *);
     VkResult (*p_vkEnumeratePhysicalDevices)(VkInstance, uint32_t *, VkPhysicalDevice *);
@@ -155,6 +157,11 @@ struct vulkan_instance_funcs
     void (*p_vkGetPhysicalDeviceProperties)(VkPhysicalDevice, VkPhysicalDeviceProperties *);
     void (*p_vkGetPhysicalDeviceQueueFamilyProperties)(VkPhysicalDevice, uint32_t *, VkQueueFamilyProperties *);
     void (*p_vkGetPhysicalDeviceSparseImageFormatProperties)(VkPhysicalDevice, VkFormat, VkImageType, VkSampleCountFlagBits, VkImageUsageFlags, VkImageTiling, uint32_t *, VkSparseImageFormatProperties *);
+    VkResult (*p_vkGetPhysicalDeviceSurfaceCapabilitiesKHR)(VkPhysicalDevice, VkSurfaceKHR, VkSurfaceCapabilitiesKHR *);
+    VkResult (*p_vkGetPhysicalDeviceSurfaceFormatsKHR)(VkPhysicalDevice, VkSurfaceKHR, uint32_t *, VkSurfaceFormatKHR *);
+    VkResult (*p_vkGetPhysicalDeviceSurfacePresentModesKHR)(VkPhysicalDevice, VkSurfaceKHR, uint32_t *, VkPresentModeKHR *);
+    VkResult (*p_vkGetPhysicalDeviceSurfaceSupportKHR)(VkPhysicalDevice, uint32_t, VkSurfaceKHR, VkBool32 *);
+    VkBool32 (*p_vkGetPhysicalDeviceWin32PresentationSupportKHR)(VkPhysicalDevice, uint32_t);
 };
 
 #define ALL_VK_DEVICE_FUNCS() \
@@ -282,7 +289,9 @@ struct vulkan_instance_funcs
 
 #define ALL_VK_INSTANCE_FUNCS() \
     USE_VK_FUNC(vkCreateDevice)\
+    USE_VK_FUNC(vkCreateWin32SurfaceKHR)\
     USE_VK_FUNC(vkDestroyInstance)\
+    USE_VK_FUNC(vkDestroySurfaceKHR)\
     USE_VK_FUNC(vkEnumerateDeviceExtensionProperties)\
     USE_VK_FUNC(vkEnumerateDeviceLayerProperties)\
     USE_VK_FUNC(vkEnumeratePhysicalDevices)\
@@ -292,6 +301,11 @@ struct vulkan_instance_funcs
     USE_VK_FUNC(vkGetPhysicalDeviceMemoryProperties)\
     USE_VK_FUNC(vkGetPhysicalDeviceProperties)\
     USE_VK_FUNC(vkGetPhysicalDeviceQueueFamilyProperties)\
-    USE_VK_FUNC(vkGetPhysicalDeviceSparseImageFormatProperties)
+    USE_VK_FUNC(vkGetPhysicalDeviceSparseImageFormatProperties)\
+    USE_VK_FUNC(vkGetPhysicalDeviceSurfaceCapabilitiesKHR)\
+    USE_VK_FUNC(vkGetPhysicalDeviceSurfaceFormatsKHR)\
+    USE_VK_FUNC(vkGetPhysicalDeviceSurfacePresentModesKHR)\
+    USE_VK_FUNC(vkGetPhysicalDeviceSurfaceSupportKHR)\
+    USE_VK_FUNC(vkGetPhysicalDeviceWin32PresentationSupportKHR)
 
 #endif /* __WINE_VULKAN_THUNKS_H */

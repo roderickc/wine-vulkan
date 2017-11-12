@@ -75,6 +75,7 @@ VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkRenderPass)
 VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkSampler)
 VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkSemaphore)
 VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkShaderModule)
+VK_DEFINE_NON_DISPATCHABLE_HANDLE(VkSurfaceKHR)
 
 typedef uint32_t VkBool32;
 typedef uint64_t VkDeviceSize;
@@ -281,6 +282,11 @@ typedef enum VkColorComponentFlagBits {
     VK_COLOR_COMPONENT_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF,
 } VkColorComponentFlagBits;
 
+typedef enum VkColorSpaceKHR {
+    VK_COLOR_SPACE_SRGB_NONLINEAR_KHR = 0,
+    VK_COLOR_SPACE_KHR_MAX_ENUM = 0x7FFFFFFF,
+} VkColorSpaceKHR;
+
 typedef enum VkCommandBufferLevel {
     VK_COMMAND_BUFFER_LEVEL_PRIMARY = 0,
     VK_COMMAND_BUFFER_LEVEL_SECONDARY = 1,
@@ -322,6 +328,14 @@ typedef enum VkComponentSwizzle {
     VK_COMPONENT_SWIZZLE_A = 6,
     VK_COMPONENT_SWIZZLE_MAX_ENUM = 0x7FFFFFFF,
 } VkComponentSwizzle;
+
+typedef enum VkCompositeAlphaFlagBitsKHR {
+    VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR = 0x00000001,
+    VK_COMPOSITE_ALPHA_PRE_MULTIPLIED_BIT_KHR = 0x00000002,
+    VK_COMPOSITE_ALPHA_POST_MULTIPLIED_BIT_KHR = 0x00000004,
+    VK_COMPOSITE_ALPHA_INHERIT_BIT_KHR = 0x00000008,
+    VK_COMPOSITE_ALPHA_FLAG_BITS_KHR_MAX_ENUM = 0x7FFFFFFF,
+} VkCompositeAlphaFlagBitsKHR;
 
 typedef enum VkCullModeFlagBits {
     VK_CULL_MODE_NONE = 0,
@@ -734,6 +748,7 @@ typedef enum VkObjectType {
     VK_OBJECT_TYPE_DESCRIPTOR_SET = 23,
     VK_OBJECT_TYPE_FRAMEBUFFER = 24,
     VK_OBJECT_TYPE_COMMAND_POOL = 25,
+    VK_OBJECT_TYPE_SURFACE_KHR = 1000000000,
     VK_OBJECT_TYPE_MAX_ENUM = 0x7FFFFFFF,
 } VkObjectType;
 
@@ -792,6 +807,14 @@ typedef enum VkPolygonMode {
     VK_POLYGON_MODE_MAX_ENUM = 0x7FFFFFFF,
 } VkPolygonMode;
 
+typedef enum VkPresentModeKHR {
+    VK_PRESENT_MODE_IMMEDIATE_KHR = 0,
+    VK_PRESENT_MODE_MAILBOX_KHR = 1,
+    VK_PRESENT_MODE_FIFO_KHR = 2,
+    VK_PRESENT_MODE_FIFO_RELAXED_KHR = 3,
+    VK_PRESENT_MODE_KHR_MAX_ENUM = 0x7FFFFFFF,
+} VkPresentModeKHR;
+
 typedef enum VkPrimitiveTopology {
     VK_PRIMITIVE_TOPOLOGY_POINT_LIST = 0,
     VK_PRIMITIVE_TOPOLOGY_LINE_LIST = 1,
@@ -843,6 +866,8 @@ typedef enum VkQueueFlagBits {
 } VkQueueFlagBits;
 
 typedef enum VkResult {
+    VK_ERROR_NATIVE_WINDOW_IN_USE_KHR = -1000000001,
+    VK_ERROR_SURFACE_LOST_KHR = -1000000000,
     VK_ERROR_FRAGMENTED_POOL = -12,
     VK_ERROR_FORMAT_NOT_SUPPORTED = -11,
     VK_ERROR_TOO_MANY_OBJECTS = -10,
@@ -981,6 +1006,7 @@ typedef enum VkStructureType {
     VK_STRUCTURE_TYPE_MEMORY_BARRIER = 46,
     VK_STRUCTURE_TYPE_LOADER_INSTANCE_CREATE_INFO = 47,
     VK_STRUCTURE_TYPE_LOADER_DEVICE_CREATE_INFO = 48,
+    VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR = 1000009000,
     VK_STRUCTURE_TYPE_MAX_ENUM = 0x7FFFFFFF,
 } VkStructureType;
 
@@ -993,6 +1019,19 @@ typedef enum VkSubpassContents {
 typedef enum VkSubpassDescriptionFlagBits {
     VK_SUBPASS_DESCRIPTION_FLAG_BITS_MAX_ENUM = 0x7FFFFFFF,
 } VkSubpassDescriptionFlagBits;
+
+typedef enum VkSurfaceTransformFlagBitsKHR {
+    VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR = 0x00000001,
+    VK_SURFACE_TRANSFORM_ROTATE_90_BIT_KHR = 0x00000002,
+    VK_SURFACE_TRANSFORM_ROTATE_180_BIT_KHR = 0x00000004,
+    VK_SURFACE_TRANSFORM_ROTATE_270_BIT_KHR = 0x00000008,
+    VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_BIT_KHR = 0x00000010,
+    VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_90_BIT_KHR = 0x00000020,
+    VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_180_BIT_KHR = 0x00000040,
+    VK_SURFACE_TRANSFORM_HORIZONTAL_MIRROR_ROTATE_270_BIT_KHR = 0x00000080,
+    VK_SURFACE_TRANSFORM_INHERIT_BIT_KHR = 0x00000100,
+    VK_SURFACE_TRANSFORM_FLAG_BITS_KHR_MAX_ENUM = 0x7FFFFFFF,
+} VkSurfaceTransformFlagBitsKHR;
 
 typedef enum VkSystemAllocationScope {
     VK_SYSTEM_ALLOCATION_SCOPE_COMMAND = 0,
@@ -1681,6 +1720,12 @@ typedef struct VkSubpassDependency
     VkDependencyFlags dependencyFlags;
 } VkSubpassDependency;
 
+typedef struct VkSurfaceFormatKHR
+{
+    VkFormat format;
+    VkColorSpaceKHR colorSpace;
+} VkSurfaceFormatKHR;
+
 typedef struct VkViewport
 {
     float x;
@@ -1922,6 +1967,29 @@ typedef struct VkRenderPassBeginInfo
     uint32_t clearValueCount;
     const VkClearValue *pClearValues;
 } VkRenderPassBeginInfo;
+
+typedef struct VkSurfaceCapabilitiesKHR
+{
+    uint32_t minImageCount;
+    uint32_t maxImageCount;
+    VkExtent2D currentExtent;
+    VkExtent2D minImageExtent;
+    VkExtent2D maxImageExtent;
+    uint32_t maxImageArrayLayers;
+    VkSurfaceTransformFlagsKHR supportedTransforms;
+    VkSurfaceTransformFlagBitsKHR currentTransform;
+    VkCompositeAlphaFlagsKHR supportedCompositeAlpha;
+    VkImageUsageFlags supportedUsageFlags;
+} VkSurfaceCapabilitiesKHR;
+
+typedef struct VkWin32SurfaceCreateInfoKHR
+{
+    VkStructureType sType;
+    const void *pNext;
+    VkWin32SurfaceCreateFlagsKHR flags;
+    HINSTANCE hinstance;
+    HWND hwnd;
+} VkWin32SurfaceCreateInfoKHR;
 
 typedef struct VkBindSparseInfo
 {
@@ -2289,6 +2357,7 @@ VkResult   VKAPI_CALL vkCreateRenderPass(VkDevice device, const VkRenderPassCrea
 VkResult   VKAPI_CALL vkCreateSampler(VkDevice device, const VkSamplerCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkSampler *pSampler);
 VkResult   VKAPI_CALL vkCreateSemaphore(VkDevice device, const VkSemaphoreCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkSemaphore *pSemaphore);
 VkResult   VKAPI_CALL vkCreateShaderModule(VkDevice device, const VkShaderModuleCreateInfo *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkShaderModule *pShaderModule);
+VkResult   VKAPI_CALL vkCreateWin32SurfaceKHR(VkInstance instance, const VkWin32SurfaceCreateInfoKHR *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkSurfaceKHR *pSurface);
 void       VKAPI_CALL vkDestroyBuffer(VkDevice device, VkBuffer buffer, const VkAllocationCallbacks *pAllocator);
 void       VKAPI_CALL vkDestroyBufferView(VkDevice device, VkBufferView bufferView, const VkAllocationCallbacks *pAllocator);
 void       VKAPI_CALL vkDestroyCommandPool(VkDevice device, VkCommandPool commandPool, const VkAllocationCallbacks *pAllocator);
@@ -2309,6 +2378,7 @@ void       VKAPI_CALL vkDestroyRenderPass(VkDevice device, VkRenderPass renderPa
 void       VKAPI_CALL vkDestroySampler(VkDevice device, VkSampler sampler, const VkAllocationCallbacks *pAllocator);
 void       VKAPI_CALL vkDestroySemaphore(VkDevice device, VkSemaphore semaphore, const VkAllocationCallbacks *pAllocator);
 void       VKAPI_CALL vkDestroyShaderModule(VkDevice device, VkShaderModule shaderModule, const VkAllocationCallbacks *pAllocator);
+void       VKAPI_CALL vkDestroySurfaceKHR(VkInstance instance, VkSurfaceKHR surface, const VkAllocationCallbacks *pAllocator);
 VkResult   VKAPI_CALL vkDeviceWaitIdle(VkDevice device);
 VkResult   VKAPI_CALL vkEndCommandBuffer(VkCommandBuffer commandBuffer);
 VkResult   VKAPI_CALL vkEnumerateDeviceExtensionProperties(VkPhysicalDevice physicalDevice, const char *pLayerName, uint32_t *pPropertyCount, VkExtensionProperties *pProperties);
@@ -2337,6 +2407,11 @@ void       VKAPI_CALL vkGetPhysicalDeviceMemoryProperties(VkPhysicalDevice physi
 void       VKAPI_CALL vkGetPhysicalDeviceProperties(VkPhysicalDevice physicalDevice, VkPhysicalDeviceProperties *pProperties);
 void       VKAPI_CALL vkGetPhysicalDeviceQueueFamilyProperties(VkPhysicalDevice physicalDevice, uint32_t *pQueueFamilyPropertyCount, VkQueueFamilyProperties *pQueueFamilyProperties);
 void       VKAPI_CALL vkGetPhysicalDeviceSparseImageFormatProperties(VkPhysicalDevice physicalDevice, VkFormat format, VkImageType type, VkSampleCountFlagBits samples, VkImageUsageFlags usage, VkImageTiling tiling, uint32_t *pPropertyCount, VkSparseImageFormatProperties *pProperties);
+VkResult   VKAPI_CALL vkGetPhysicalDeviceSurfaceCapabilitiesKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, VkSurfaceCapabilitiesKHR *pSurfaceCapabilities);
+VkResult   VKAPI_CALL vkGetPhysicalDeviceSurfaceFormatsKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, uint32_t *pSurfaceFormatCount, VkSurfaceFormatKHR *pSurfaceFormats);
+VkResult   VKAPI_CALL vkGetPhysicalDeviceSurfacePresentModesKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, uint32_t *pPresentModeCount, VkPresentModeKHR *pPresentModes);
+VkResult   VKAPI_CALL vkGetPhysicalDeviceSurfaceSupportKHR(VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex, VkSurfaceKHR surface, VkBool32 *pSupported);
+VkBool32   VKAPI_CALL vkGetPhysicalDeviceWin32PresentationSupportKHR(VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex);
 VkResult   VKAPI_CALL vkGetPipelineCacheData(VkDevice device, VkPipelineCache pipelineCache, size_t *pDataSize, void *pData);
 VkResult   VKAPI_CALL vkGetQueryPoolResults(VkDevice device, VkQueryPool queryPool, uint32_t firstQuery, uint32_t queryCount, size_t dataSize, void *pData, VkDeviceSize stride, VkQueryResultFlags flags);
 void       VKAPI_CALL vkGetRenderAreaGranularity(VkDevice device, VkRenderPass renderPass, VkExtent2D *pGranularity);

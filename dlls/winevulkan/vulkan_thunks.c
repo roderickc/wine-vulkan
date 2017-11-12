@@ -380,6 +380,12 @@ static VkResult WINAPI wine_vkCreateShaderModule(VkDevice device, const VkShader
     return VK_ERROR_OUT_OF_HOST_MEMORY;
 }
 
+static VkResult WINAPI wine_vkCreateWin32SurfaceKHR(VkInstance instance, const VkWin32SurfaceCreateInfoKHR *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkSurfaceKHR *pSurface)
+{
+    FIXME("stub: %p, %p, %p, %p\n", instance, pCreateInfo, pAllocator, pSurface);
+    return VK_ERROR_OUT_OF_HOST_MEMORY;
+}
+
 static void WINAPI wine_vkDestroyBuffer(VkDevice device, VkBuffer buffer, const VkAllocationCallbacks *pAllocator)
 {
     FIXME("stub: %p, 0x%s, %p\n", device, wine_dbgstr_longlong(buffer), pAllocator);
@@ -468,6 +474,11 @@ static void WINAPI wine_vkDestroySemaphore(VkDevice device, VkSemaphore semaphor
 static void WINAPI wine_vkDestroyShaderModule(VkDevice device, VkShaderModule shaderModule, const VkAllocationCallbacks *pAllocator)
 {
     FIXME("stub: %p, 0x%s, %p\n", device, wine_dbgstr_longlong(shaderModule), pAllocator);
+}
+
+static void WINAPI wine_vkDestroySurfaceKHR(VkInstance instance, VkSurfaceKHR surface, const VkAllocationCallbacks *pAllocator)
+{
+    FIXME("stub: %p, 0x%s, %p\n", instance, wine_dbgstr_longlong(surface), pAllocator);
 }
 
 static VkResult WINAPI wine_vkDeviceWaitIdle(VkDevice device)
@@ -598,6 +609,36 @@ static void WINAPI wine_vkGetPhysicalDeviceSparseImageFormatProperties(VkPhysica
 {
     TRACE("%p, %d, %d, %d, %#x, %d, %p, %p\n", physicalDevice, format, type, samples, usage, tiling, pPropertyCount, pProperties);
     physicalDevice->instance->funcs.p_vkGetPhysicalDeviceSparseImageFormatProperties(physicalDevice->phys_dev, format, type, samples, usage, tiling, pPropertyCount, pProperties);
+}
+
+static VkResult WINAPI wine_vkGetPhysicalDeviceSurfaceCapabilitiesKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, VkSurfaceCapabilitiesKHR *pSurfaceCapabilities)
+{
+    FIXME("stub: %p, 0x%s, %p\n", physicalDevice, wine_dbgstr_longlong(surface), pSurfaceCapabilities);
+    return VK_ERROR_OUT_OF_HOST_MEMORY;
+}
+
+static VkResult WINAPI wine_vkGetPhysicalDeviceSurfaceFormatsKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, uint32_t *pSurfaceFormatCount, VkSurfaceFormatKHR *pSurfaceFormats)
+{
+    FIXME("stub: %p, 0x%s, %p, %p\n", physicalDevice, wine_dbgstr_longlong(surface), pSurfaceFormatCount, pSurfaceFormats);
+    return VK_ERROR_OUT_OF_HOST_MEMORY;
+}
+
+static VkResult WINAPI wine_vkGetPhysicalDeviceSurfacePresentModesKHR(VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, uint32_t *pPresentModeCount, VkPresentModeKHR *pPresentModes)
+{
+    FIXME("stub: %p, 0x%s, %p, %p\n", physicalDevice, wine_dbgstr_longlong(surface), pPresentModeCount, pPresentModes);
+    return VK_ERROR_OUT_OF_HOST_MEMORY;
+}
+
+static VkResult WINAPI wine_vkGetPhysicalDeviceSurfaceSupportKHR(VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex, VkSurfaceKHR surface, VkBool32 *pSupported)
+{
+    FIXME("stub: %p, %u, 0x%s, %p\n", physicalDevice, queueFamilyIndex, wine_dbgstr_longlong(surface), pSupported);
+    return VK_ERROR_OUT_OF_HOST_MEMORY;
+}
+
+static VkBool32 WINAPI wine_vkGetPhysicalDeviceWin32PresentationSupportKHR(VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex)
+{
+    TRACE("%p, %u\n", physicalDevice, queueFamilyIndex);
+    return physicalDevice->instance->funcs.p_vkGetPhysicalDeviceWin32PresentationSupportKHR(physicalDevice->phys_dev, queueFamilyIndex);
 }
 
 static VkResult WINAPI wine_vkGetPipelineCacheData(VkDevice device, VkPipelineCache pipelineCache, size_t *pDataSize, void *pData)
@@ -831,7 +872,9 @@ static const struct vulkan_func vk_device_dispatch_table[] = {
 
 static const struct vulkan_func vk_instance_dispatch_table[] = {
     {"vkCreateDevice", &wine_vkCreateDevice},
+    {"vkCreateWin32SurfaceKHR", &wine_vkCreateWin32SurfaceKHR},
     {"vkDestroyInstance", &wine_vkDestroyInstance},
+    {"vkDestroySurfaceKHR", &wine_vkDestroySurfaceKHR},
     {"vkEnumerateDeviceExtensionProperties", &wine_vkEnumerateDeviceExtensionProperties},
     {"vkEnumerateDeviceLayerProperties", &wine_vkEnumerateDeviceLayerProperties},
     {"vkEnumeratePhysicalDevices", &wine_vkEnumeratePhysicalDevices},
@@ -842,8 +885,12 @@ static const struct vulkan_func vk_instance_dispatch_table[] = {
     {"vkGetPhysicalDeviceProperties", &wine_vkGetPhysicalDeviceProperties},
     {"vkGetPhysicalDeviceQueueFamilyProperties", &wine_vkGetPhysicalDeviceQueueFamilyProperties},
     {"vkGetPhysicalDeviceSparseImageFormatProperties", &wine_vkGetPhysicalDeviceSparseImageFormatProperties},
+    {"vkGetPhysicalDeviceSurfaceCapabilitiesKHR", &wine_vkGetPhysicalDeviceSurfaceCapabilitiesKHR},
+    {"vkGetPhysicalDeviceSurfaceFormatsKHR", &wine_vkGetPhysicalDeviceSurfaceFormatsKHR},
+    {"vkGetPhysicalDeviceSurfacePresentModesKHR", &wine_vkGetPhysicalDeviceSurfacePresentModesKHR},
+    {"vkGetPhysicalDeviceSurfaceSupportKHR", &wine_vkGetPhysicalDeviceSurfaceSupportKHR},
+    {"vkGetPhysicalDeviceWin32PresentationSupportKHR", &wine_vkGetPhysicalDeviceWin32PresentationSupportKHR},
 };
-
 void *wine_vk_get_device_proc_addr(const char *name)
 {
     int i;
