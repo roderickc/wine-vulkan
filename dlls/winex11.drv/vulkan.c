@@ -27,6 +27,7 @@
 
 #include "wine/debug.h"
 #include "wine/library.h"
+#include "x11drv.h"
 #include "wine/vulkan.h"
 #include "wine/vulkan_driver.h"
 
@@ -38,6 +39,9 @@ WINE_DEFAULT_DEBUG_CHANNEL(vulkan);
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
 #endif
 
+typedef VkFlags VkXlibSurfaceCreateFlagsKHR;
+#define VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR 1000004000
+
 /* All Vulkan structures use this structure for the first elements. */
 struct wine_vk_structure_header
 {
@@ -45,7 +49,16 @@ struct wine_vk_structure_header
     const void *pNext;
 };
 
+typedef struct VkXlibSurfaceCreateInfoKHR {
+    VkStructureType                sType;
+    const void*                    pNext;
+    VkXlibSurfaceCreateFlagsKHR    flags;
+    Display*                       dpy;
+    Window                         window;
+} VkXlibSurfaceCreateInfoKHR;
+
 static VkResult (*pvkCreateInstance)(const VkInstanceCreateInfo *, const VkAllocationCallbacks *, VkInstance *);
+static VkResult (*pvkCreateXlibSurfaceKHR)(VkInstance, const VkXlibSurfaceCreateInfoKHR *, const VkAllocationCallbacks *, VkSurfaceKHR *);
 static void (*pvkDestroyInstance)(VkInstance, const VkAllocationCallbacks *);
 static void * (*pvkGetDeviceProcAddr)(VkDevice, const char *);
 static void * (*pvkGetInstanceProcAddr)(VkInstance, const char *);
@@ -67,6 +80,7 @@ static BOOL wine_vk_init(void)
 
 #define LOAD_FUNCPTR(f) if((p##f = wine_dlsym(vulkan_handle, #f, NULL, 0)) == NULL) return FALSE;
 LOAD_FUNCPTR(vkCreateInstance)
+LOAD_FUNCPTR(vkCreateXlibSurfaceKHR)
 LOAD_FUNCPTR(vkDestroyInstance)
 LOAD_FUNCPTR(vkGetDeviceProcAddr)
 LOAD_FUNCPTR(vkGetInstanceProcAddr)
@@ -175,8 +189,30 @@ static VkResult X11DRV_vkCreateInstance(const VkInstanceCreateInfo *pCreateInfo,
 static VkResult X11DRV_vkCreateWin32SurfaceKHR(VkInstance instance, const VkWin32SurfaceCreateInfoKHR *pCreateInfo,
         const VkAllocationCallbacks *pAllocator, VkSurfaceKHR *pSurface)
 {
-    FIXME("stub: %p %p %p %p\n", instance, pCreateInfo, pAllocator, pSurface);
-    return VK_ERROR_OUT_OF_HOST_MEMORY;
+    VkResult res;
+    VkXlibSurfaceCreateInfoKHR create_info;
+    TRACE("%p %p %p %p\n", instance, pCreateInfo, pAllocator, pSurface);
+
+    if (pAllocator)
+        FIXME("Support for allocation callbacks not implemented yet\n");
+
+    create_info.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+    create_info.pNext = NULL;
+    create_info.flags = 0; /* reserved */
+    create_info.dpy = gdi_display;
+    /* This is just a temporary hack to get some kind of X11 window.
+     * The code won't be submitted to Wine like this.
+     * Long-term this call may become more complicated due to child
+     * window rendering. Vulkan allows for this, but I have not encounted
+     * any application using it yet. */
+    create_info.window = (Window)(DWORD_PTR)GetPropA( pCreateInfo->hwnd, "__wine_x11_whole_window" );
+
+    res = pvkCreateXlibSurfaceKHR(instance, &create_info, NULL /* pAllocator */, pSurface);
+    if (res != VK_SUCCESS)
+        return res;
+
+    TRACE("Created surface=0x%s\n", wine_dbgstr_longlong(*pSurface));
+    return VK_SUCCESS;
 }
 
 static void X11DRV_vkDestroyInstance(VkInstance instance, const VkAllocationCallbacks *pAllocator)
