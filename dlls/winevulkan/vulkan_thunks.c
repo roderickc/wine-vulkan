@@ -10,6 +10,12 @@
 
 WINE_DEFAULT_DEBUG_CHANNEL(vulkan);
 
+static VkResult WINAPI wine_vkAcquireNextImageKHR(VkDevice device, VkSwapchainKHR swapchain, uint64_t timeout, VkSemaphore semaphore, VkFence fence, uint32_t *pImageIndex)
+{
+    TRACE("%p, 0x%s, 0x%s, 0x%s, 0x%s, %p\n", device, wine_dbgstr_longlong(swapchain), wine_dbgstr_longlong(timeout), wine_dbgstr_longlong(semaphore), wine_dbgstr_longlong(fence), pImageIndex);
+    return device->funcs.p_vkAcquireNextImageKHR(device->device, swapchain, timeout, semaphore, fence, pImageIndex);
+}
+
 static VkResult WINAPI wine_vkAllocateCommandBuffers(VkDevice device, const VkCommandBufferAllocateInfo *pAllocateInfo, VkCommandBuffer *pCommandBuffers)
 {
     FIXME("stub: %p, %p, %p\n", device, pAllocateInfo, pCommandBuffers);
@@ -380,6 +386,12 @@ static VkResult WINAPI wine_vkCreateShaderModule(VkDevice device, const VkShader
     return VK_ERROR_OUT_OF_HOST_MEMORY;
 }
 
+static VkResult WINAPI wine_vkCreateSwapchainKHR(VkDevice device, const VkSwapchainCreateInfoKHR *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkSwapchainKHR *pSwapchain)
+{
+    TRACE("%p, %p, %p, %p\n", device, pCreateInfo, pAllocator, pSwapchain);
+    return device->funcs.p_vkCreateSwapchainKHR(device->device, pCreateInfo, NULL, pSwapchain);
+}
+
 static void WINAPI wine_vkDestroyBuffer(VkDevice device, VkBuffer buffer, const VkAllocationCallbacks *pAllocator)
 {
     FIXME("stub: %p, 0x%s, %p\n", device, wine_dbgstr_longlong(buffer), pAllocator);
@@ -468,6 +480,12 @@ static void WINAPI wine_vkDestroySemaphore(VkDevice device, VkSemaphore semaphor
 static void WINAPI wine_vkDestroyShaderModule(VkDevice device, VkShaderModule shaderModule, const VkAllocationCallbacks *pAllocator)
 {
     FIXME("stub: %p, 0x%s, %p\n", device, wine_dbgstr_longlong(shaderModule), pAllocator);
+}
+
+static void WINAPI wine_vkDestroySwapchainKHR(VkDevice device, VkSwapchainKHR swapchain, const VkAllocationCallbacks *pAllocator)
+{
+    TRACE("%p, 0x%s, %p\n", device, wine_dbgstr_longlong(swapchain), pAllocator);
+    device->funcs.p_vkDestroySwapchainKHR(device->device, swapchain, NULL);
 }
 
 static VkResult WINAPI wine_vkDeviceWaitIdle(VkDevice device)
@@ -641,6 +659,12 @@ static void WINAPI wine_vkGetRenderAreaGranularity(VkDevice device, VkRenderPass
     FIXME("stub: %p, 0x%s, %p\n", device, wine_dbgstr_longlong(renderPass), pGranularity);
 }
 
+static VkResult WINAPI wine_vkGetSwapchainImagesKHR(VkDevice device, VkSwapchainKHR swapchain, uint32_t *pSwapchainImageCount, VkImage *pSwapchainImages)
+{
+    TRACE("%p, 0x%s, %p, %p\n", device, wine_dbgstr_longlong(swapchain), pSwapchainImageCount, pSwapchainImages);
+    return device->funcs.p_vkGetSwapchainImagesKHR(device->device, swapchain, pSwapchainImageCount, pSwapchainImages);
+}
+
 static VkResult WINAPI wine_vkInvalidateMappedMemoryRanges(VkDevice device, uint32_t memoryRangeCount, const VkMappedMemoryRange *pMemoryRanges)
 {
     FIXME("stub: %p, %u, %p\n", device, memoryRangeCount, pMemoryRanges);
@@ -662,6 +686,12 @@ static VkResult WINAPI wine_vkMergePipelineCaches(VkDevice device, VkPipelineCac
 static VkResult WINAPI wine_vkQueueBindSparse(VkQueue queue, uint32_t bindInfoCount, const VkBindSparseInfo *pBindInfo, VkFence fence)
 {
     FIXME("stub: %p, %u, %p, 0x%s\n", queue, bindInfoCount, pBindInfo, wine_dbgstr_longlong(fence));
+    return VK_ERROR_OUT_OF_HOST_MEMORY;
+}
+
+static VkResult WINAPI wine_vkQueuePresentKHR(VkQueue queue, const VkPresentInfoKHR *pPresentInfo)
+{
+    FIXME("stub: %p, %p\n", queue, pPresentInfo);
     return VK_ERROR_OUT_OF_HOST_MEMORY;
 }
 
@@ -730,6 +760,7 @@ static VkResult WINAPI wine_vkWaitForFences(VkDevice device, uint32_t fenceCount
 }
 
 static const struct vulkan_func vk_device_dispatch_table[] = {
+    {"vkAcquireNextImageKHR", &wine_vkAcquireNextImageKHR},
     {"vkAllocateCommandBuffers", &wine_vkAllocateCommandBuffers},
     {"vkAllocateDescriptorSets", &wine_vkAllocateDescriptorSets},
     {"vkAllocateMemory", &wine_vkAllocateMemory},
@@ -799,6 +830,7 @@ static const struct vulkan_func vk_device_dispatch_table[] = {
     {"vkCreateSampler", &wine_vkCreateSampler},
     {"vkCreateSemaphore", &wine_vkCreateSemaphore},
     {"vkCreateShaderModule", &wine_vkCreateShaderModule},
+    {"vkCreateSwapchainKHR", &wine_vkCreateSwapchainKHR},
     {"vkDestroyBuffer", &wine_vkDestroyBuffer},
     {"vkDestroyBufferView", &wine_vkDestroyBufferView},
     {"vkDestroyCommandPool", &wine_vkDestroyCommandPool},
@@ -818,6 +850,7 @@ static const struct vulkan_func vk_device_dispatch_table[] = {
     {"vkDestroySampler", &wine_vkDestroySampler},
     {"vkDestroySemaphore", &wine_vkDestroySemaphore},
     {"vkDestroyShaderModule", &wine_vkDestroyShaderModule},
+    {"vkDestroySwapchainKHR", &wine_vkDestroySwapchainKHR},
     {"vkDeviceWaitIdle", &wine_vkDeviceWaitIdle},
     {"vkEndCommandBuffer", &wine_vkEndCommandBuffer},
     {"vkFlushMappedMemoryRanges", &wine_vkFlushMappedMemoryRanges},
@@ -836,10 +869,12 @@ static const struct vulkan_func vk_device_dispatch_table[] = {
     {"vkGetPipelineCacheData", &wine_vkGetPipelineCacheData},
     {"vkGetQueryPoolResults", &wine_vkGetQueryPoolResults},
     {"vkGetRenderAreaGranularity", &wine_vkGetRenderAreaGranularity},
+    {"vkGetSwapchainImagesKHR", &wine_vkGetSwapchainImagesKHR},
     {"vkInvalidateMappedMemoryRanges", &wine_vkInvalidateMappedMemoryRanges},
     {"vkMapMemory", &wine_vkMapMemory},
     {"vkMergePipelineCaches", &wine_vkMergePipelineCaches},
     {"vkQueueBindSparse", &wine_vkQueueBindSparse},
+    {"vkQueuePresentKHR", &wine_vkQueuePresentKHR},
     {"vkQueueSubmit", &wine_vkQueueSubmit},
     {"vkQueueWaitIdle", &wine_vkQueueWaitIdle},
     {"vkResetCommandBuffer", &wine_vkResetCommandBuffer},

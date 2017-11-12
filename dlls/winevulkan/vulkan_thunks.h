@@ -20,6 +20,7 @@ VkBool32 WINAPI wine_vkGetPhysicalDeviceWin32PresentationSupportKHR(VkPhysicalDe
 /* For use by vkDevice and children */
 struct vulkan_device_funcs
 {
+    VkResult (*p_vkAcquireNextImageKHR)(VkDevice, VkSwapchainKHR, uint64_t, VkSemaphore, VkFence, uint32_t *);
     VkResult (*p_vkAllocateCommandBuffers)(VkDevice, const VkCommandBufferAllocateInfo *, VkCommandBuffer *);
     VkResult (*p_vkAllocateDescriptorSets)(VkDevice, const VkDescriptorSetAllocateInfo *, VkDescriptorSet *);
     VkResult (*p_vkAllocateMemory)(VkDevice, const VkMemoryAllocateInfo *, const VkAllocationCallbacks *, VkDeviceMemory *);
@@ -89,6 +90,7 @@ struct vulkan_device_funcs
     VkResult (*p_vkCreateSampler)(VkDevice, const VkSamplerCreateInfo *, const VkAllocationCallbacks *, VkSampler *);
     VkResult (*p_vkCreateSemaphore)(VkDevice, const VkSemaphoreCreateInfo *, const VkAllocationCallbacks *, VkSemaphore *);
     VkResult (*p_vkCreateShaderModule)(VkDevice, const VkShaderModuleCreateInfo *, const VkAllocationCallbacks *, VkShaderModule *);
+    VkResult (*p_vkCreateSwapchainKHR)(VkDevice, const VkSwapchainCreateInfoKHR *, const VkAllocationCallbacks *, VkSwapchainKHR *);
     void (*p_vkDestroyBuffer)(VkDevice, VkBuffer, const VkAllocationCallbacks *);
     void (*p_vkDestroyBufferView)(VkDevice, VkBufferView, const VkAllocationCallbacks *);
     void (*p_vkDestroyCommandPool)(VkDevice, VkCommandPool, const VkAllocationCallbacks *);
@@ -108,6 +110,7 @@ struct vulkan_device_funcs
     void (*p_vkDestroySampler)(VkDevice, VkSampler, const VkAllocationCallbacks *);
     void (*p_vkDestroySemaphore)(VkDevice, VkSemaphore, const VkAllocationCallbacks *);
     void (*p_vkDestroyShaderModule)(VkDevice, VkShaderModule, const VkAllocationCallbacks *);
+    void (*p_vkDestroySwapchainKHR)(VkDevice, VkSwapchainKHR, const VkAllocationCallbacks *);
     VkResult (*p_vkDeviceWaitIdle)(VkDevice);
     VkResult (*p_vkEndCommandBuffer)(VkCommandBuffer);
     VkResult (*p_vkFlushMappedMemoryRanges)(VkDevice, uint32_t, const VkMappedMemoryRange *);
@@ -126,10 +129,12 @@ struct vulkan_device_funcs
     VkResult (*p_vkGetPipelineCacheData)(VkDevice, VkPipelineCache, size_t *, void *);
     VkResult (*p_vkGetQueryPoolResults)(VkDevice, VkQueryPool, uint32_t, uint32_t, size_t, void *, VkDeviceSize, VkQueryResultFlags);
     void (*p_vkGetRenderAreaGranularity)(VkDevice, VkRenderPass, VkExtent2D *);
+    VkResult (*p_vkGetSwapchainImagesKHR)(VkDevice, VkSwapchainKHR, uint32_t *, VkImage *);
     VkResult (*p_vkInvalidateMappedMemoryRanges)(VkDevice, uint32_t, const VkMappedMemoryRange *);
     VkResult (*p_vkMapMemory)(VkDevice, VkDeviceMemory, VkDeviceSize, VkDeviceSize, VkMemoryMapFlags, void **);
     VkResult (*p_vkMergePipelineCaches)(VkDevice, VkPipelineCache, uint32_t, const VkPipelineCache *);
     VkResult (*p_vkQueueBindSparse)(VkQueue, uint32_t, const VkBindSparseInfo *, VkFence);
+    VkResult (*p_vkQueuePresentKHR)(VkQueue, const VkPresentInfoKHR *);
     VkResult (*p_vkQueueSubmit)(VkQueue, uint32_t, const VkSubmitInfo *, VkFence);
     VkResult (*p_vkQueueWaitIdle)(VkQueue);
     VkResult (*p_vkResetCommandBuffer)(VkCommandBuffer, VkCommandBufferResetFlags);
@@ -168,6 +173,7 @@ struct vulkan_instance_funcs
 };
 
 #define ALL_VK_DEVICE_FUNCS() \
+    USE_VK_FUNC(vkAcquireNextImageKHR) \
     USE_VK_FUNC(vkAllocateCommandBuffers) \
     USE_VK_FUNC(vkAllocateDescriptorSets) \
     USE_VK_FUNC(vkAllocateMemory) \
@@ -237,6 +243,7 @@ struct vulkan_instance_funcs
     USE_VK_FUNC(vkCreateSampler) \
     USE_VK_FUNC(vkCreateSemaphore) \
     USE_VK_FUNC(vkCreateShaderModule) \
+    USE_VK_FUNC(vkCreateSwapchainKHR) \
     USE_VK_FUNC(vkDestroyBuffer) \
     USE_VK_FUNC(vkDestroyBufferView) \
     USE_VK_FUNC(vkDestroyCommandPool) \
@@ -256,6 +263,7 @@ struct vulkan_instance_funcs
     USE_VK_FUNC(vkDestroySampler) \
     USE_VK_FUNC(vkDestroySemaphore) \
     USE_VK_FUNC(vkDestroyShaderModule) \
+    USE_VK_FUNC(vkDestroySwapchainKHR) \
     USE_VK_FUNC(vkDeviceWaitIdle) \
     USE_VK_FUNC(vkEndCommandBuffer) \
     USE_VK_FUNC(vkFlushMappedMemoryRanges) \
@@ -274,10 +282,12 @@ struct vulkan_instance_funcs
     USE_VK_FUNC(vkGetPipelineCacheData) \
     USE_VK_FUNC(vkGetQueryPoolResults) \
     USE_VK_FUNC(vkGetRenderAreaGranularity) \
+    USE_VK_FUNC(vkGetSwapchainImagesKHR) \
     USE_VK_FUNC(vkInvalidateMappedMemoryRanges) \
     USE_VK_FUNC(vkMapMemory) \
     USE_VK_FUNC(vkMergePipelineCaches) \
     USE_VK_FUNC(vkQueueBindSparse) \
+    USE_VK_FUNC(vkQueuePresentKHR) \
     USE_VK_FUNC(vkQueueSubmit) \
     USE_VK_FUNC(vkQueueWaitIdle) \
     USE_VK_FUNC(vkResetCommandBuffer) \
