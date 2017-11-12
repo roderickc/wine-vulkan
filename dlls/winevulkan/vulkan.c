@@ -314,6 +314,17 @@ err:
     return res;
 }
 
+VkResult WINAPI wine_vkCreateWin32SurfaceKHR(VkInstance instance, const VkWin32SurfaceCreateInfoKHR* pCreateInfo,
+        const VkAllocationCallbacks* pAllocator, VkSurfaceKHR* pSurface)
+{
+    TRACE(" %p %p %p %p\n", instance, pCreateInfo, pAllocator, pSurface);
+
+    if (pAllocator)
+        FIXME("Support allocation allocators\n");
+
+    return vk_funcs->p_vkCreateWin32SurfaceKHR(instance->instance, pCreateInfo, NULL /* pAllocator */, pSurface);
+}
+
 void WINAPI wine_vkDestroyDevice(VkDevice device, const VkAllocationCallbacks *pAllocator)
 {
     TRACE("%p %p\n", device, pAllocator);
@@ -334,6 +345,16 @@ void WINAPI wine_vkDestroyInstance(VkInstance instance, const VkAllocationCallba
         FIXME("Support allocation allocators\n");
 
     wine_vk_instance_free(instance);
+}
+
+void WINAPI wine_vkDestroySurfaceKHR(VkInstance instance, VkSurfaceKHR surface, const VkAllocationCallbacks *pAllocator)
+{
+    TRACE("%p, 0x%s, %p\n", instance, wine_dbgstr_longlong(surface), pAllocator);
+
+    if (pAllocator)
+        FIXME("Support allocation allocators\n");
+
+    return vk_funcs->p_vkDestroySurfaceKHR(instance, surface, pAllocator);
 }
 
 static VkResult WINAPI wine_vkEnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pPropertyCount,
@@ -448,6 +469,12 @@ static PFN_vkVoidFunction WINAPI wine_vkGetInstanceProcAddr(VkInstance instance,
 
     FIXME("Unsupported device or instance function: '%s'\n", pName);
     return NULL;
+}
+
+VkBool32 WINAPI wine_vkGetPhysicalDeviceWin32PresentationSupportKHR(VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex)
+{
+    TRACE("%p %u\n", physicalDevice, queueFamilyIndex);
+    return vk_funcs->p_vkGetPhysicalDeviceWin32PresentationSupportKHR(physicalDevice->phys_dev, queueFamilyIndex);
 }
 
 void * WINAPI wine_vk_icdGetInstanceProcAddr(VkInstance instance, const char *pName)

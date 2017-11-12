@@ -380,12 +380,6 @@ static VkResult WINAPI wine_vkCreateShaderModule(VkDevice device, const VkShader
     return VK_ERROR_OUT_OF_HOST_MEMORY;
 }
 
-static VkResult WINAPI wine_vkCreateWin32SurfaceKHR(VkInstance instance, const VkWin32SurfaceCreateInfoKHR *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkSurfaceKHR *pSurface)
-{
-    FIXME("stub: %p, %p, %p, %p\n", instance, pCreateInfo, pAllocator, pSurface);
-    return VK_ERROR_OUT_OF_HOST_MEMORY;
-}
-
 static void WINAPI wine_vkDestroyBuffer(VkDevice device, VkBuffer buffer, const VkAllocationCallbacks *pAllocator)
 {
     FIXME("stub: %p, 0x%s, %p\n", device, wine_dbgstr_longlong(buffer), pAllocator);
@@ -474,11 +468,6 @@ static void WINAPI wine_vkDestroySemaphore(VkDevice device, VkSemaphore semaphor
 static void WINAPI wine_vkDestroyShaderModule(VkDevice device, VkShaderModule shaderModule, const VkAllocationCallbacks *pAllocator)
 {
     FIXME("stub: %p, 0x%s, %p\n", device, wine_dbgstr_longlong(shaderModule), pAllocator);
-}
-
-static void WINAPI wine_vkDestroySurfaceKHR(VkInstance instance, VkSurfaceKHR surface, const VkAllocationCallbacks *pAllocator)
-{
-    FIXME("stub: %p, 0x%s, %p\n", instance, wine_dbgstr_longlong(surface), pAllocator);
 }
 
 static VkResult WINAPI wine_vkDeviceWaitIdle(VkDevice device)
@@ -633,12 +622,6 @@ static VkResult WINAPI wine_vkGetPhysicalDeviceSurfaceSupportKHR(VkPhysicalDevic
 {
     FIXME("stub: %p, %u, 0x%s, %p\n", physicalDevice, queueFamilyIndex, wine_dbgstr_longlong(surface), pSupported);
     return VK_ERROR_OUT_OF_HOST_MEMORY;
-}
-
-static VkBool32 WINAPI wine_vkGetPhysicalDeviceWin32PresentationSupportKHR(VkPhysicalDevice physicalDevice, uint32_t queueFamilyIndex)
-{
-    TRACE("%p, %u\n", physicalDevice, queueFamilyIndex);
-    return physicalDevice->instance->funcs.p_vkGetPhysicalDeviceWin32PresentationSupportKHR(physicalDevice->phys_dev, queueFamilyIndex);
 }
 
 static VkResult WINAPI wine_vkGetPipelineCacheData(VkDevice device, VkPipelineCache pipelineCache, size_t *pDataSize, void *pData)
