@@ -737,20 +737,20 @@ static VkResult WINAPI wine_vkMergePipelineCaches(VkDevice device, VkPipelineCac
 
 static VkResult WINAPI wine_vkQueueBindSparse(VkQueue queue, uint32_t bindInfoCount, const VkBindSparseInfo *pBindInfo, VkFence fence)
 {
-    FIXME("stub: %p, %u, %p, 0x%s\n", queue, bindInfoCount, pBindInfo, wine_dbgstr_longlong(fence));
-    return VK_ERROR_OUT_OF_HOST_MEMORY;
+    TRACE("%p, %u, %p, 0x%s\n", queue, bindInfoCount, pBindInfo, wine_dbgstr_longlong(fence));
+    return queue->device->funcs.p_vkQueueBindSparse(queue->queue, bindInfoCount, pBindInfo, fence);
 }
 
 static VkResult WINAPI wine_vkQueuePresentKHR(VkQueue queue, const VkPresentInfoKHR *pPresentInfo)
 {
-    FIXME("stub: %p, %p\n", queue, pPresentInfo);
-    return VK_ERROR_OUT_OF_HOST_MEMORY;
+    TRACE("%p, %p\n", queue, pPresentInfo);
+    return queue->device->funcs.p_vkQueuePresentKHR(queue->queue, pPresentInfo);
 }
 
 static VkResult WINAPI wine_vkQueueWaitIdle(VkQueue queue)
 {
-    FIXME("stub: %p\n", queue);
-    return VK_ERROR_OUT_OF_HOST_MEMORY;
+    TRACE("%p\n", queue);
+    return queue->device->funcs.p_vkQueueWaitIdle(queue->queue);
 }
 
 static VkResult WINAPI wine_vkResetCommandBuffer(VkCommandBuffer commandBuffer, VkCommandBufferResetFlags flags)
