@@ -668,6 +668,67 @@ VkResult WINAPI wine_vk_icdNegotiateLoaderICDInterfaceVersion(uint32_t *pSupport
     return VK_SUCCESS;
 }
 
+VkResult WINAPI wine_vkQueueSubmit(VkQueue queue, uint32_t submitCount, const VkSubmitInfo *pSubmits, VkFence fence)
+{
+    VkSubmitInfo *submits;
+    VkResult res;
+    VkCommandBuffer *command_buffers;
+    int i, num_command_buffers;
+
+    TRACE("%p %u %p 0x%s\n", queue, submitCount, pSubmits, wine_dbgstr_longlong(fence));
+
+    if (submitCount == 0)
+    {
+        return queue->device->funcs.p_vkQueueSubmit(queue->queue, 0, NULL, fence);
+    }
+
+    submits = HeapAlloc(GetProcessHeap(), 0, sizeof(*submits)*submitCount);
+    if (!submits)
+    {
+        ERR("Unable to allocate memory for submit buffers!\n");
+        return VK_ERROR_OUT_OF_HOST_MEMORY;
+    }
+
+    for (i = 0; i < submitCount; i++)
+    {
+        int j;
+
+        memcpy(&submits[i], &pSubmits[i], sizeof(*submits));
+
+        num_command_buffers = pSubmits[i].commandBufferCount;
+        command_buffers = HeapAlloc(GetProcessHeap(), 0, sizeof(*submits)*num_command_buffers);
+        if (!command_buffers)
+        {
+            ERR("Unable to allocate memory for comman buffers!\n");
+            res = VK_ERROR_OUT_OF_HOST_MEMORY;
+            goto err;
+        }
+
+        for (j = 0; j < num_command_buffers; j++)
+        {
+            command_buffers[j] = pSubmits[i].pCommandBuffers[j]->command_buffer;
+        }
+        submits[i].pCommandBuffers = command_buffers;
+    }
+
+    res = queue->device->funcs.p_vkQueueSubmit(queue->queue, submitCount, submits, fence);
+
+err:
+    if (submits)
+    {
+        for (i = 0; i < submitCount; i++)
+        {
+            if (submits[i].pCommandBuffers)
+                HeapFree(GetProcessHeap(), 0, (void*)submits[i].pCommandBuffers);
+        }
+        HeapFree(GetProcessHeap(), 0, submits);
+    }
+
+    TRACE("Returning %d\n", res);
+    return res;
+}
+
+
 BOOL WINAPI DllMain(HINSTANCE hinst, DWORD reason, LPVOID reserved)
 {
     switch(reason)

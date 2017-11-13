@@ -747,12 +747,6 @@ static VkResult WINAPI wine_vkQueuePresentKHR(VkQueue queue, const VkPresentInfo
     return VK_ERROR_OUT_OF_HOST_MEMORY;
 }
 
-static VkResult WINAPI wine_vkQueueSubmit(VkQueue queue, uint32_t submitCount, const VkSubmitInfo *pSubmits, VkFence fence)
-{
-    FIXME("stub: %p, %u, %p, 0x%s\n", queue, submitCount, pSubmits, wine_dbgstr_longlong(fence));
-    return VK_ERROR_OUT_OF_HOST_MEMORY;
-}
-
 static VkResult WINAPI wine_vkQueueWaitIdle(VkQueue queue)
 {
     FIXME("stub: %p\n", queue);
