@@ -16,12 +16,6 @@ static VkResult WINAPI wine_vkAcquireNextImageKHR(VkDevice device, VkSwapchainKH
     return device->funcs.p_vkAcquireNextImageKHR(device->device, swapchain, timeout, semaphore, fence, pImageIndex);
 }
 
-static VkResult WINAPI wine_vkAllocateCommandBuffers(VkDevice device, const VkCommandBufferAllocateInfo *pAllocateInfo, VkCommandBuffer *pCommandBuffers)
-{
-    FIXME("stub: %p, %p, %p\n", device, pAllocateInfo, pCommandBuffers);
-    return VK_ERROR_OUT_OF_HOST_MEMORY;
-}
-
 static VkResult WINAPI wine_vkAllocateDescriptorSets(VkDevice device, const VkDescriptorSetAllocateInfo *pAllocateInfo, VkDescriptorSet *pDescriptorSets)
 {
     TRACE("%p, %p, %p\n", device, pAllocateInfo, pDescriptorSets);
@@ -534,11 +528,6 @@ static VkResult WINAPI wine_vkFlushMappedMemoryRanges(VkDevice device, uint32_t 
 {
     TRACE("%p, %u, %p\n", device, memoryRangeCount, pMemoryRanges);
     return device->funcs.p_vkFlushMappedMemoryRanges(device->device, memoryRangeCount, pMemoryRanges);
-}
-
-static void WINAPI wine_vkFreeCommandBuffers(VkDevice device, VkCommandPool commandPool, uint32_t commandBufferCount, const VkCommandBuffer *pCommandBuffers)
-{
-    FIXME("stub: %p, 0x%s, %u, %p\n", device, wine_dbgstr_longlong(commandPool), commandBufferCount, pCommandBuffers);
 }
 
 static VkResult WINAPI wine_vkFreeDescriptorSets(VkDevice device, VkDescriptorPool descriptorPool, uint32_t descriptorSetCount, const VkDescriptorSet *pDescriptorSets)

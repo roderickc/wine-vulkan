@@ -95,6 +95,21 @@ static void wine_vk_device_free(struct VkDevice_T *device)
     HeapFree(GetProcessHeap(), 0, device);
 }
 
+/* Helper function for release command buffers. */
+static void wine_vk_device_free_command_buffers(VkDevice device, VkCommandPool pool, uint32_t count, const VkCommandBuffer *buffers)
+{
+    int i;
+
+    /* To avoid have to wrap all command buffers just loop over them one by one. */
+    for (i = 0; i < count; i++)
+    {
+        if (buffers[i]->command_buffer)
+            device->funcs.p_vkFreeCommandBuffers(device->device, pool, 1, &buffers[i]->command_buffer);
+
+        HeapFree(GetProcessHeap(), 0, buffers[i]);
+    }
+}
+
 static void *wine_vk_get_global_proc_addr(const char *name)
 {
     int i;
@@ -259,6 +274,51 @@ static void wine_vk_instance_free(struct VkInstance_T *instance)
         vk_funcs->p_vkDestroyInstance(instance->instance, NULL /* pAllocator */);
 
     HeapFree(GetProcessHeap(), 0, instance);
+}
+
+VkResult WINAPI wine_vkAllocateCommandBuffers(VkDevice device, const VkCommandBufferAllocateInfo *pAllocateInfo,
+        VkCommandBuffer *pCommandBuffers)
+{
+    VkResult res = VK_SUCCESS;
+    int i;
+
+    TRACE("%p %p %p\n", device, pAllocateInfo, pCommandBuffers);
+
+    /* The application provides an array of buffers, we just clear it for error handling reasons. */
+    memset(pCommandBuffers, 0, sizeof(*pCommandBuffers)*pAllocateInfo->commandBufferCount);
+
+    for (i = 0; i < pAllocateInfo->commandBufferCount; i++)
+    {
+        VkCommandBufferAllocateInfo allocate_info;
+        allocate_info.commandPool = pAllocateInfo->commandPool;
+        allocate_info.level = pAllocateInfo->level;
+        allocate_info.commandBufferCount = 1;
+
+        TRACE("Creating command buffer %d, pool 0x%s, level %d\n", i, wine_dbgstr_longlong(allocate_info.commandPool),
+                allocate_info.level);
+        pCommandBuffers[i] = wine_vk_alloc_dispatchable_object(sizeof(struct VkCommandBuffer_T));
+        if (!pCommandBuffers[i])
+        {
+            res = VK_ERROR_OUT_OF_HOST_MEMORY;
+            break;
+        }
+
+        pCommandBuffers[i]->device = device;
+        res = device->funcs.p_vkAllocateCommandBuffers(device->device, &allocate_info, &pCommandBuffers[i]->command_buffer);
+        if (res != VK_SUCCESS)
+        {
+            ERR("Failed to allocate command buffer, res=%d\n", res);
+            break;
+        }
+    }
+
+    if (res != VK_SUCCESS)
+    {
+        wine_vk_device_free_command_buffers(device, pAllocateInfo->commandPool, i, pCommandBuffers);
+        return res;
+    }
+
+    return VK_SUCCESS;
 }
 
 VkResult WINAPI wine_vkCreateDevice(VkPhysicalDevice physicalDevice, const VkDeviceCreateInfo *pCreateInfo,
@@ -503,6 +563,14 @@ VkResult WINAPI wine_vkEnumeratePhysicalDevices(VkInstance instance, uint32_t *p
 
     TRACE("Returning %d devices\n", *pPhysicalDeviceCount);
     return res;
+}
+
+void WINAPI wine_vkFreeCommandBuffers(VkDevice device, VkCommandPool commandPool, uint32_t commandBufferCount,
+        const VkCommandBuffer *pCommandBuffers)
+{
+    TRACE("%p 0x%s %d %p\n", device, wine_dbgstr_longlong(commandPool), commandBufferCount, pCommandBuffers);
+
+    wine_vk_device_free_command_buffers(device, commandPool, commandBufferCount, pCommandBuffers);
 }
 
 PFN_vkVoidFunction WINAPI wine_vkGetDeviceProcAddr(VkDevice device, const char *pName)
