@@ -354,7 +354,7 @@ void WINAPI wine_vkDestroySurfaceKHR(VkInstance instance, VkSurfaceKHR surface, 
     if (pAllocator)
         FIXME("Support allocation allocators\n");
 
-    return vk_funcs->p_vkDestroySurfaceKHR(instance, surface, pAllocator);
+    return vk_funcs->p_vkDestroySurfaceKHR(instance->instance, surface, pAllocator);
 }
 
 static VkResult WINAPI wine_vkEnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pPropertyCount,

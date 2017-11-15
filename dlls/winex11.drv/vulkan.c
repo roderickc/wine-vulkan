@@ -60,6 +60,7 @@ typedef struct VkXlibSurfaceCreateInfoKHR {
 static VkResult (*pvkCreateInstance)(const VkInstanceCreateInfo *, const VkAllocationCallbacks *, VkInstance *);
 static VkResult (*pvkCreateXlibSurfaceKHR)(VkInstance, const VkXlibSurfaceCreateInfoKHR *, const VkAllocationCallbacks *, VkSurfaceKHR *);
 static void (*pvkDestroyInstance)(VkInstance, const VkAllocationCallbacks *);
+static void (*pvkDestroySurfaceKHR)(VkInstance, VkSurfaceKHR, const VkAllocationCallbacks *);
 static void * (*pvkGetDeviceProcAddr)(VkDevice, const char *);
 static void * (*pvkGetInstanceProcAddr)(VkInstance, const char *);
 static VkBool32 (*pvkGetPhysicalDeviceXlibPresentationSupportKHR)(VkPhysicalDevice, uint32_t, Display *, VisualID);
@@ -83,6 +84,7 @@ static BOOL wine_vk_init(void)
 LOAD_FUNCPTR(vkCreateInstance)
 LOAD_FUNCPTR(vkCreateXlibSurfaceKHR)
 LOAD_FUNCPTR(vkDestroyInstance)
+LOAD_FUNCPTR(vkDestroySurfaceKHR)
 LOAD_FUNCPTR(vkGetDeviceProcAddr)
 LOAD_FUNCPTR(vkGetInstanceProcAddr)
 LOAD_FUNCPTR(vkGetPhysicalDeviceXlibPresentationSupportKHR)
@@ -229,7 +231,12 @@ static void X11DRV_vkDestroyInstance(VkInstance instance, const VkAllocationCall
 
 static void X11DRV_vkDestroySurfaceKHR(VkInstance instance, VkSurfaceKHR surface, const VkAllocationCallbacks *pAllocator)
 {
-    FIXME("stub: %p 0x%s %p\n", instance, wine_dbgstr_longlong(surface), pAllocator);
+    TRACE("%p 0x%s %p\n", instance, wine_dbgstr_longlong(surface), pAllocator);
+
+    if (pAllocator)
+        FIXME("Support for allocation callbacks not implemented yet\n");
+
+    pvkDestroySurfaceKHR(instance, surface, NULL /* pAllocator */);
 }
 
 static VkResult X11DRV_vkEnumerateInstanceExtensionProperties(const char *pLayerName, uint32_t *pPropertyCount,
