@@ -471,6 +471,12 @@ VkResult WINAPI wine_vkCreateWin32SurfaceKHR(VkInstance instance, const VkWin32S
     return vk_funcs->p_vkCreateWin32SurfaceKHR(instance->instance, pCreateInfo, NULL /* pAllocator */, pSurface);
 }
 
+void WINAPI wine_vkCmdExecuteCommands(VkCommandBuffer commandBuffer, uint32_t commandBufferCount,
+        const VkCommandBuffer *pCommandBuffers)
+{
+    FIXME("stub: %p %u %p\n", commandBuffer, commandBufferCount, pCommandBuffers);
+}
+
 void WINAPI wine_vkDestroyDevice(VkDevice device, const VkAllocationCallbacks *pAllocator)
 {
     TRACE("%p %p\n", device, pAllocator);
