@@ -14,6 +14,11 @@
 #define VKAPI_PTR VKAPI_CALL
 #endif
 
+/* Callers can override WINE_VK_ALIGN if they want 'host' headers. */
+#ifndef WINE_VK_ALIGN
+#define WINE_VK_ALIGN DECLSPEC_ALIGN
+#endif
+
 #define VK_MAX_PHYSICAL_DEVICE_NAME_SIZE 256
 #define VK_UUID_SIZE 16
 #define VK_LUID_SIZE_KHX 8
@@ -1101,9 +1106,9 @@ typedef struct VkAttachmentDescription
 
 typedef struct VkBufferCopy
 {
-    VkDeviceSize srcOffset;
-    VkDeviceSize dstOffset;
-    VkDeviceSize size;
+    VkDeviceSize WINE_VK_ALIGN(8) srcOffset;
+    VkDeviceSize WINE_VK_ALIGN(8) dstOffset;
+    VkDeviceSize WINE_VK_ALIGN(8) size;
 } VkBufferCopy;
 
 typedef struct VkBufferMemoryBarrier
@@ -1114,9 +1119,9 @@ typedef struct VkBufferMemoryBarrier
     VkAccessFlags dstAccessMask;
     uint32_t srcQueueFamilyIndex;
     uint32_t dstQueueFamilyIndex;
-    VkBuffer buffer;
-    VkDeviceSize offset;
-    VkDeviceSize size;
+    VkBuffer WINE_VK_ALIGN(8) buffer;
+    VkDeviceSize WINE_VK_ALIGN(8) offset;
+    VkDeviceSize WINE_VK_ALIGN(8) size;
 } VkBufferMemoryBarrier;
 
 typedef union VkClearColorValue
@@ -1130,7 +1135,7 @@ typedef struct VkCommandBufferAllocateInfo
 {
     VkStructureType sType;
     const void *pNext;
-    VkCommandPool commandPool;
+    VkCommandPool WINE_VK_ALIGN(8) commandPool;
     VkCommandBufferLevel level;
     uint32_t commandBufferCount;
 } VkCommandBufferAllocateInfo;
@@ -1139,9 +1144,9 @@ typedef struct VkCommandBufferInheritanceInfo
 {
     VkStructureType sType;
     const void *pNext;
-    VkRenderPass renderPass;
+    VkRenderPass WINE_VK_ALIGN(8) renderPass;
     uint32_t subpass;
-    VkFramebuffer framebuffer;
+    VkFramebuffer WINE_VK_ALIGN(8) framebuffer;
     VkBool32 occlusionQueryEnable;
     VkQueryControlFlags queryFlags;
     VkQueryPipelineStatisticFlags pipelineStatistics;
@@ -1159,10 +1164,10 @@ typedef struct VkCopyDescriptorSet
 {
     VkStructureType sType;
     const void *pNext;
-    VkDescriptorSet srcSet;
+    VkDescriptorSet WINE_VK_ALIGN(8) srcSet;
     uint32_t srcBinding;
     uint32_t srcArrayElement;
-    VkDescriptorSet dstSet;
+    VkDescriptorSet WINE_VK_ALIGN(8) dstSet;
     uint32_t dstBinding;
     uint32_t dstArrayElement;
     uint32_t descriptorCount;
@@ -1170,8 +1175,8 @@ typedef struct VkCopyDescriptorSet
 
 typedef struct VkDescriptorImageInfo
 {
-    VkSampler sampler;
-    VkImageView imageView;
+    VkSampler WINE_VK_ALIGN(8) sampler;
+    VkImageView WINE_VK_ALIGN(8) imageView;
     VkImageLayout imageLayout;
 } VkDescriptorImageInfo;
 
@@ -1230,7 +1235,7 @@ typedef struct VkFramebufferCreateInfo
     VkStructureType sType;
     const void *pNext;
     VkFramebufferCreateFlags flags;
-    VkRenderPass renderPass;
+    VkRenderPass WINE_VK_ALIGN(8) renderPass;
     uint32_t attachmentCount;
     const VkImageView *pAttachments;
     uint32_t width;
@@ -1278,7 +1283,7 @@ typedef struct VkImageViewCreateInfo
     VkStructureType sType;
     const void *pNext;
     VkImageViewCreateFlags flags;
-    VkImage image;
+    VkImage WINE_VK_ALIGN(8) image;
     VkImageViewType viewType;
     VkFormat format;
     VkComponentMapping components;
@@ -1297,23 +1302,23 @@ typedef struct VkMappedMemoryRange
 {
     VkStructureType sType;
     const void *pNext;
-    VkDeviceMemory memory;
-    VkDeviceSize offset;
-    VkDeviceSize size;
+    VkDeviceMemory WINE_VK_ALIGN(8) memory;
+    VkDeviceSize WINE_VK_ALIGN(8) offset;
+    VkDeviceSize WINE_VK_ALIGN(8) size;
 } VkMappedMemoryRange;
 
 typedef struct VkMemoryAllocateInfo
 {
     VkStructureType sType;
     const void *pNext;
-    VkDeviceSize allocationSize;
+    VkDeviceSize WINE_VK_ALIGN(8) allocationSize;
     uint32_t memoryTypeIndex;
 } VkMemoryAllocateInfo;
 
 typedef struct VkMemoryRequirements
 {
-    VkDeviceSize size;
-    VkDeviceSize alignment;
+    VkDeviceSize WINE_VK_ALIGN(8) size;
+    VkDeviceSize WINE_VK_ALIGN(8) alignment;
     uint32_t memoryTypeBits;
 } VkMemoryRequirements;
 
@@ -1466,8 +1471,8 @@ typedef struct VkSparseImageMemoryBind
     VkImageSubresource subresource;
     VkOffset3D offset;
     VkExtent3D extent;
-    VkDeviceMemory memory;
-    VkDeviceSize memoryOffset;
+    VkDeviceMemory WINE_VK_ALIGN(8) memory;
+    VkDeviceSize WINE_VK_ALIGN(8) memoryOffset;
     VkSparseMemoryBindFlags flags;
 } VkSparseImageMemoryBind;
 
@@ -1475,17 +1480,17 @@ typedef struct VkSparseImageMemoryRequirements
 {
     VkSparseImageFormatProperties formatProperties;
     uint32_t imageMipTailFirstLod;
-    VkDeviceSize imageMipTailSize;
-    VkDeviceSize imageMipTailOffset;
-    VkDeviceSize imageMipTailStride;
+    VkDeviceSize WINE_VK_ALIGN(8) imageMipTailSize;
+    VkDeviceSize WINE_VK_ALIGN(8) imageMipTailOffset;
+    VkDeviceSize WINE_VK_ALIGN(8) imageMipTailStride;
 } VkSparseImageMemoryRequirements;
 
 typedef struct VkSparseMemoryBind
 {
-    VkDeviceSize resourceOffset;
-    VkDeviceSize size;
-    VkDeviceMemory memory;
-    VkDeviceSize memoryOffset;
+    VkDeviceSize WINE_VK_ALIGN(8) resourceOffset;
+    VkDeviceSize WINE_VK_ALIGN(8) size;
+    VkDeviceMemory WINE_VK_ALIGN(8) memory;
+    VkDeviceSize WINE_VK_ALIGN(8) memoryOffset;
     VkSparseMemoryBindFlags flags;
 } VkSparseMemoryBind;
 
@@ -1511,11 +1516,11 @@ typedef struct VkSubmitInfo
 
 typedef struct VkSubresourceLayout
 {
-    VkDeviceSize offset;
-    VkDeviceSize size;
-    VkDeviceSize rowPitch;
-    VkDeviceSize arrayPitch;
-    VkDeviceSize depthPitch;
+    VkDeviceSize WINE_VK_ALIGN(8) offset;
+    VkDeviceSize WINE_VK_ALIGN(8) size;
+    VkDeviceSize WINE_VK_ALIGN(8) rowPitch;
+    VkDeviceSize WINE_VK_ALIGN(8) arrayPitch;
+    VkDeviceSize WINE_VK_ALIGN(8) depthPitch;
 } VkSubresourceLayout;
 
 typedef struct VkVertexInputAttributeDescription
@@ -1547,7 +1552,7 @@ typedef struct VkBufferCreateInfo
     VkStructureType sType;
     const void *pNext;
     VkBufferCreateFlags flags;
-    VkDeviceSize size;
+    VkDeviceSize WINE_VK_ALIGN(8) size;
     VkBufferUsageFlags usage;
     VkSharingMode sharingMode;
     uint32_t queueFamilyIndexCount;
@@ -1559,10 +1564,10 @@ typedef struct VkBufferViewCreateInfo
     VkStructureType sType;
     const void *pNext;
     VkBufferViewCreateFlags flags;
-    VkBuffer buffer;
+    VkBuffer WINE_VK_ALIGN(8) buffer;
     VkFormat format;
-    VkDeviceSize offset;
-    VkDeviceSize range;
+    VkDeviceSize WINE_VK_ALIGN(8) offset;
+    VkDeviceSize WINE_VK_ALIGN(8) range;
 } VkBufferViewCreateInfo;
 
 typedef struct VkClearDepthStencilValue
@@ -1587,16 +1592,16 @@ typedef struct VkCommandBufferBeginInfo
 
 typedef struct VkDescriptorBufferInfo
 {
-    VkBuffer buffer;
-    VkDeviceSize offset;
-    VkDeviceSize range;
+    VkBuffer WINE_VK_ALIGN(8) buffer;
+    VkDeviceSize WINE_VK_ALIGN(8) offset;
+    VkDeviceSize WINE_VK_ALIGN(8) range;
 } VkDescriptorBufferInfo;
 
 typedef struct VkDescriptorSetAllocateInfo
 {
     VkStructureType sType;
     const void *pNext;
-    VkDescriptorPool descriptorPool;
+    VkDescriptorPool WINE_VK_ALIGN(8) descriptorPool;
     uint32_t descriptorSetCount;
     const VkDescriptorSetLayout *pSetLayouts;
 } VkDescriptorSetAllocateInfo;
@@ -1620,7 +1625,7 @@ typedef struct VkImageFormatProperties
     uint32_t maxMipLevels;
     uint32_t maxArrayLayers;
     VkSampleCountFlags sampleCounts;
-    VkDeviceSize maxResourceSize;
+    VkDeviceSize WINE_VK_ALIGN(8) maxResourceSize;
 } VkImageFormatProperties;
 
 typedef struct VkImageSubresourceLayers
@@ -1712,14 +1717,14 @@ typedef struct VkSamplerCreateInfo
 
 typedef struct VkSparseBufferMemoryBindInfo
 {
-    VkBuffer buffer;
+    VkBuffer WINE_VK_ALIGN(8) buffer;
     uint32_t bindCount;
     const VkSparseMemoryBind *pBinds;
 } VkSparseBufferMemoryBindInfo;
 
 typedef struct VkSparseImageMemoryBindInfo
 {
-    VkImage image;
+    VkImage WINE_VK_ALIGN(8) image;
     uint32_t bindCount;
     const VkSparseImageMemoryBind *pBinds;
 } VkSparseImageMemoryBindInfo;
@@ -1763,7 +1768,7 @@ typedef struct VkWriteDescriptorSet
 {
     VkStructureType sType;
     const void *pNext;
-    VkDescriptorSet dstSet;
+    VkDescriptorSet WINE_VK_ALIGN(8) dstSet;
     uint32_t dstBinding;
     uint32_t dstArrayElement;
     uint32_t descriptorCount;
@@ -1786,7 +1791,7 @@ typedef struct VkApplicationInfo
 
 typedef struct VkBufferImageCopy
 {
-    VkDeviceSize bufferOffset;
+    VkDeviceSize WINE_VK_ALIGN(8) bufferOffset;
     uint32_t bufferRowLength;
     uint32_t bufferImageHeight;
     VkImageSubresourceLayers imageSubresource;
@@ -1839,7 +1844,7 @@ typedef struct VkImageMemoryBarrier
     VkImageLayout newLayout;
     uint32_t srcQueueFamilyIndex;
     uint32_t dstQueueFamilyIndex;
-    VkImage image;
+    VkImage WINE_VK_ALIGN(8) image;
     VkImageSubresourceRange subresourceRange;
 } VkImageMemoryBarrier;
 
@@ -1864,7 +1869,7 @@ typedef struct VkPipelineShaderStageCreateInfo
     const void *pNext;
     VkPipelineShaderStageCreateFlags flags;
     VkShaderStageFlagBits stage;
-    VkShaderModule module;
+    VkShaderModule WINE_VK_ALIGN(8) module;
     const char *pName;
     const VkSpecializationInfo *pSpecializationInfo;
 } VkPipelineShaderStageCreateInfo;
@@ -1886,7 +1891,7 @@ typedef struct VkShaderModuleCreateInfo
 
 typedef struct VkSparseImageOpaqueMemoryBindInfo
 {
-    VkImage image;
+    VkImage WINE_VK_ALIGN(8) image;
     uint32_t bindCount;
     const VkSparseMemoryBind *pBinds;
 } VkSparseImageOpaqueMemoryBindInfo;
@@ -1910,7 +1915,7 @@ typedef struct VkSwapchainCreateInfoKHR
     VkStructureType sType;
     const void *pNext;
     VkSwapchainCreateFlagsKHR flags;
-    VkSurfaceKHR surface;
+    VkSurfaceKHR WINE_VK_ALIGN(8) surface;
     uint32_t minImageCount;
     VkFormat imageFormat;
     VkColorSpaceKHR imageColorSpace;
@@ -1924,7 +1929,7 @@ typedef struct VkSwapchainCreateInfoKHR
     VkCompositeAlphaFlagBitsKHR compositeAlpha;
     VkPresentModeKHR presentMode;
     VkBool32 clipped;
-    VkSwapchainKHR oldSwapchain;
+    VkSwapchainKHR WINE_VK_ALIGN(8) oldSwapchain;
 } VkSwapchainCreateInfoKHR;
 
 typedef struct VkClearAttachment
@@ -1967,7 +1972,7 @@ typedef struct VkImageCopy
 
 typedef struct VkMemoryHeap
 {
-    VkDeviceSize size;
+    VkDeviceSize WINE_VK_ALIGN(8) size;
     VkMemoryHeapFlags flags;
 } VkMemoryHeap;
 
@@ -1976,7 +1981,7 @@ typedef struct VkPhysicalDeviceMemoryProperties
     uint32_t memoryTypeCount;
     VkMemoryType memoryTypes[VK_MAX_MEMORY_TYPES];
     uint32_t memoryHeapCount;
-    VkMemoryHeap memoryHeaps[VK_MAX_MEMORY_HEAPS];
+    VkMemoryHeap WINE_VK_ALIGN(8) memoryHeaps[VK_MAX_MEMORY_HEAPS];
 } VkPhysicalDeviceMemoryProperties;
 
 typedef struct VkPipelineColorBlendStateCreateInfo
@@ -2006,8 +2011,8 @@ typedef struct VkRenderPassBeginInfo
 {
     VkStructureType sType;
     const void *pNext;
-    VkRenderPass renderPass;
-    VkFramebuffer framebuffer;
+    VkRenderPass WINE_VK_ALIGN(8) renderPass;
+    VkFramebuffer WINE_VK_ALIGN(8) framebuffer;
     VkRect2D renderArea;
     uint32_t clearValueCount;
     const VkClearValue *pClearValues;
@@ -2057,9 +2062,9 @@ typedef struct VkComputePipelineCreateInfo
     VkStructureType sType;
     const void *pNext;
     VkPipelineCreateFlags flags;
-    VkPipelineShaderStageCreateInfo stage;
-    VkPipelineLayout layout;
-    VkPipeline basePipelineHandle;
+    VkPipelineShaderStageCreateInfo WINE_VK_ALIGN(8) stage;
+    VkPipelineLayout WINE_VK_ALIGN(8) layout;
+    VkPipeline WINE_VK_ALIGN(8) basePipelineHandle;
     int32_t basePipelineIndex;
 } VkComputePipelineCreateInfo;
 
@@ -2169,8 +2174,8 @@ typedef struct VkPhysicalDeviceLimits
     uint32_t maxPushConstantsSize;
     uint32_t maxMemoryAllocationCount;
     uint32_t maxSamplerAllocationCount;
-    VkDeviceSize bufferImageGranularity;
-    VkDeviceSize sparseAddressSpaceSize;
+    VkDeviceSize WINE_VK_ALIGN(8) bufferImageGranularity;
+    VkDeviceSize WINE_VK_ALIGN(8) sparseAddressSpaceSize;
     uint32_t maxBoundDescriptorSets;
     uint32_t maxPerStageDescriptorSamplers;
     uint32_t maxPerStageDescriptorUniformBuffers;
@@ -2225,9 +2230,9 @@ typedef struct VkPhysicalDeviceLimits
     float viewportBoundsRange[2];
     uint32_t viewportSubPixelBits;
     size_t minMemoryMapAlignment;
-    VkDeviceSize minTexelBufferOffsetAlignment;
-    VkDeviceSize minUniformBufferOffsetAlignment;
-    VkDeviceSize minStorageBufferOffsetAlignment;
+    VkDeviceSize WINE_VK_ALIGN(8) minTexelBufferOffsetAlignment;
+    VkDeviceSize WINE_VK_ALIGN(8) minUniformBufferOffsetAlignment;
+    VkDeviceSize WINE_VK_ALIGN(8) minStorageBufferOffsetAlignment;
     int32_t minTexelOffset;
     uint32_t maxTexelOffset;
     int32_t minTexelGatherOffset;
@@ -2261,9 +2266,9 @@ typedef struct VkPhysicalDeviceLimits
     float lineWidthGranularity;
     VkBool32 strictLines;
     VkBool32 standardSampleLocations;
-    VkDeviceSize optimalBufferCopyOffsetAlignment;
-    VkDeviceSize optimalBufferCopyRowPitchAlignment;
-    VkDeviceSize nonCoherentAtomSize;
+    VkDeviceSize WINE_VK_ALIGN(8) optimalBufferCopyOffsetAlignment;
+    VkDeviceSize WINE_VK_ALIGN(8) optimalBufferCopyRowPitchAlignment;
+    VkDeviceSize WINE_VK_ALIGN(8) nonCoherentAtomSize;
 } VkPhysicalDeviceLimits;
 
 typedef struct VkPipelineLayoutCreateInfo
@@ -2293,7 +2298,7 @@ typedef struct VkPhysicalDeviceProperties
     VkPhysicalDeviceType deviceType;
     char deviceName[VK_MAX_PHYSICAL_DEVICE_NAME_SIZE];
     uint8_t pipelineCacheUUID[VK_UUID_SIZE];
-    VkPhysicalDeviceLimits limits;
+    VkPhysicalDeviceLimits WINE_VK_ALIGN(8) limits;
     VkPhysicalDeviceSparseProperties sparseProperties;
 } VkPhysicalDeviceProperties;
 
@@ -2324,10 +2329,10 @@ typedef struct VkGraphicsPipelineCreateInfo
     const VkPipelineDepthStencilStateCreateInfo *pDepthStencilState;
     const VkPipelineColorBlendStateCreateInfo *pColorBlendState;
     const VkPipelineDynamicStateCreateInfo *pDynamicState;
-    VkPipelineLayout layout;
-    VkRenderPass renderPass;
+    VkPipelineLayout WINE_VK_ALIGN(8) layout;
+    VkRenderPass WINE_VK_ALIGN(8) renderPass;
     uint32_t subpass;
-    VkPipeline basePipelineHandle;
+    VkPipeline WINE_VK_ALIGN(8) basePipelineHandle;
     int32_t basePipelineIndex;
 } VkGraphicsPipelineCreateInfo;
 
