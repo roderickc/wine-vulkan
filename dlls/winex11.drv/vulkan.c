@@ -67,6 +67,7 @@ static void (*pvkDestroyInstance)(VkInstance, const VkAllocationCallbacks *);
 static void (*pvkDestroySurfaceKHR)(VkInstance, VkSurfaceKHR, const VkAllocationCallbacks *);
 static void (*pvkDestroySwapchainKHR)(VkDevice, VkSwapchainKHR, const VkAllocationCallbacks *);
 static VkResult (*pvkEnumerateInstanceExtensionProperties)(const char *, uint32_t *, VkExtensionProperties *);
+static VkResult (*pvkEnumerateInstanceVersion)(uint32_t *);
 static void * (*pvkGetDeviceProcAddr)(VkDevice, const char *);
 static void * (*pvkGetInstanceProcAddr)(VkInstance, const char *);
 static VkResult (*pvkGetPhysicalDeviceSurfaceCapabilitiesKHR)(VkPhysicalDevice, VkSurfaceKHR, VkSurfaceCapabilitiesKHR *);
@@ -104,6 +105,7 @@ static BOOL WINAPI wine_vk_init(INIT_ONCE *once, void *param, void **context)
     LOAD_FUNCPTR(vkDestroySurfaceKHR)
     LOAD_FUNCPTR(vkDestroySwapchainKHR)
     LOAD_FUNCPTR(vkEnumerateInstanceExtensionProperties)
+    LOAD_FUNCPTR(vkEnumerateInstanceVersion)
     LOAD_FUNCPTR(vkGetDeviceProcAddr)
     LOAD_FUNCPTR(vkGetInstanceProcAddr)
     LOAD_FUNCPTR(vkGetPhysicalDeviceSurfaceCapabilitiesKHR)
@@ -371,6 +373,20 @@ static VkResult X11DRV_vkEnumerateInstanceExtensionProperties(const char *layer_
     return res;
 }
 
+static VkResult X11DRV_vkEnumerateInstanceVersion(uint32_t *version)
+{
+    TRACE("%p\n", version);
+
+    /* Vulkan 1.0 ICDs don't have to support vkEnumerateInstanceVersion.
+     * Return a non-VK_SUCCESS value (allowed) instead of guessing an
+     * appropriate 1.0.x API version.
+     */
+    if (!pvkEnumerateInstanceVersion)
+        return VK_ERROR_INCOMPATIBLE_DRIVER;
+
+    return pvkEnumerateInstanceVersion(version);
+}
+
 static void *X11DRV_vkGetDeviceProcAddr(VkDevice device, const char *name)
 {
     void *proc_addr;
@@ -471,6 +487,7 @@ static const struct vulkan_funcs vulkan_funcs =
     X11DRV_vkDestroySurfaceKHR,
     X11DRV_vkDestroySwapchainKHR,
     X11DRV_vkEnumerateInstanceExtensionProperties,
+    X11DRV_vkEnumerateInstanceVersion,
     X11DRV_vkGetDeviceProcAddr,
     X11DRV_vkGetInstanceProcAddr,
     X11DRV_vkGetPhysicalDeviceSurfaceCapabilitiesKHR,
@@ -523,6 +540,8 @@ static void *get_vulkan_driver_instance_proc_addr(const struct vulkan_funcs *vul
         return vulkan_funcs->p_vkCreateInstance;
     if (!strcmp(name, "EnumerateInstanceExtensionProperties"))
         return vulkan_funcs->p_vkEnumerateInstanceExtensionProperties;
+    if (!strcmp(name, "EnumerateInstanceVersion"))
+        return vulkan_funcs->p_vkEnumerateInstanceVersion;
 
     if (!instance)
         return NULL;

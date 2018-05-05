@@ -759,8 +759,8 @@ VkResult WINAPI wine_vkEnumerateInstanceExtensionProperties(const char *layer_na
 
 VkResult WINAPI wine_vkEnumerateInstanceVersion(uint32_t *version)
 {
-    FIXME("stub: %p\n", version);
-    return VK_ERROR_INCOMPATIBLE_DRIVER;
+    TRACE("%p\n", version);
+    return vk_funcs->p_vkEnumerateInstanceVersion(version);
 }
 
 VkResult WINAPI wine_vkEnumeratePhysicalDevices(VkInstance instance, uint32_t *count,
