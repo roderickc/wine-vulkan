@@ -154,7 +154,7 @@ static void wine_vk_command_buffers_free(struct VkDevice_T *device, VkCommandPoo
 
 /* Helper function to create queues for a given family index. */
 static struct VkQueue_T *wine_vk_device_alloc_queues(struct VkDevice_T *device,
-        uint32_t family_index, uint32_t queue_count)
+        uint32_t family_index, uint32_t queue_count, VkDeviceQueueCreateFlags flags)
 {
     struct VkQueue_T *queues;
     unsigned int i;
@@ -169,6 +169,7 @@ static struct VkQueue_T *wine_vk_device_alloc_queues(struct VkDevice_T *device,
     {
         struct VkQueue_T *queue = &queues[i];
         queue->device = device;
+        queue->flags = flags;
 
         /* The native device was already allocated with the required number of queues,
          * so just fetch them from there.
@@ -561,11 +562,13 @@ VkResult WINAPI wine_vkCreateDevice(VkPhysicalDevice phys_dev,
     for (i = 0; i < create_info_host.queueCreateInfoCount; i++)
     {
         uint32_t family_index = create_info_host.pQueueCreateInfos[i].queueFamilyIndex;
+        uint32_t flags = create_info_host.pQueueCreateInfos[i].queueFamilyIndex;
         uint32_t queue_count = create_info_host.pQueueCreateInfos[i].queueCount;
 
         TRACE("queueFamilyIndex %u, queueCount %u\n", family_index, queue_count);
 
-        object->queues[family_index] = wine_vk_device_alloc_queues(object, family_index, queue_count);
+        object->queues[family_index] = wine_vk_device_alloc_queues(object, family_index,
+                queue_count, flags);
         if (!object->queues[family_index])
         {
             ERR("Failed to allocate memory for queues\n");
@@ -844,7 +847,11 @@ void WINAPI wine_vkGetDeviceQueue(VkDevice device, uint32_t family_index,
 
 void WINAPI wine_vkGetDeviceQueue2(VkDevice device, const VkDeviceQueueInfo2 *info, VkQueue *queue)
 {
-    FIXME("stub: %p %p %p\n", device, info, queue);
+    TRACE("%p %p %p\n", device, info, queue);
+
+    *queue = &device->queues[info->queueFamilyIndex][info->queueIndex];
+    if ((*queue)->flags != info->flags)
+        *queue = VK_NULL_HANDLE;
 }
 
 PFN_vkVoidFunction WINAPI wine_vkGetInstanceProcAddr(VkInstance instance, const char *name)

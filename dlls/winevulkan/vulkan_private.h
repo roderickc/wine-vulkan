@@ -109,6 +109,8 @@ struct VkQueue_T
 {
     struct wine_vk_base base;
     struct VkDevice_T *device; /* parent */
+
+    VkDeviceQueueCreateFlags flags;
     VkQueue queue; /* native queue */
 };
 
