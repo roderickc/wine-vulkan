@@ -757,6 +757,12 @@ VkResult WINAPI wine_vkEnumerateInstanceExtensionProperties(const char *layer_na
     return *count < num_properties ? VK_INCOMPLETE : VK_SUCCESS;
 }
 
+VkResult WINAPI wine_vkEnumerateInstanceVersion(uint32_t *version)
+{
+    FIXME("stub: %p\n", version);
+    return VK_ERROR_INCOMPATIBLE_DRIVER;
+}
+
 VkResult WINAPI wine_vkEnumeratePhysicalDevices(VkInstance instance, uint32_t *count,
         VkPhysicalDevice *devices)
 {
@@ -834,6 +840,11 @@ void WINAPI wine_vkGetDeviceQueue(VkDevice device, uint32_t family_index,
     TRACE("%p %u %u %p\n", device, family_index, queue_index, queue);
 
     *queue = &device->queues[family_index][queue_index];
+}
+
+void WINAPI wine_vkGetDeviceQueue2(VkDevice device, const VkDeviceQueueInfo2 *info, VkQueue *queue)
+{
+    FIXME("stub: %p %p %p\n", device, info, queue);
 }
 
 PFN_vkVoidFunction WINAPI wine_vkGetInstanceProcAddr(VkInstance instance, const char *name)
@@ -972,6 +983,7 @@ static const struct vulkan_func vk_global_dispatch_table[] =
 {
     {"vkCreateInstance", &wine_vkCreateInstance},
     {"vkEnumerateInstanceExtensionProperties", &wine_vkEnumerateInstanceExtensionProperties},
+    {"vkEnumerateInstanceVersion", &wine_vkEnumerateInstanceVersion},
     {"vkGetInstanceProcAddr", &wine_vkGetInstanceProcAddr},
 };
 

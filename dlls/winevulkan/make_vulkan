@@ -143,6 +143,7 @@ FUNCTION_OVERRIDES = {
     # Global functions
     "vkCreateInstance" : {"dispatch" : False, "driver" : True, "thunk" : False},
     "vkEnumerateInstanceExtensionProperties" : {"dispatch" : False, "driver" : True, "thunk" : False},
+    "vkEnumerateInstanceVersion" : {"dispatch" : False, "driver" : False, "thunk" : False},
     "vkGetInstanceProcAddr": {"dispatch" : False, "driver" : True, "thunk" : False},
 
     # Instance functions
@@ -158,6 +159,7 @@ FUNCTION_OVERRIDES = {
     "vkFreeCommandBuffers" : {"dispatch" : True, "driver" : False, "thunk" : False},
     "vkGetDeviceProcAddr" : {"dispatch" : False, "driver" : True, "thunk" : False},
     "vkGetDeviceQueue" : {"dispatch": True, "driver" : False, "thunk" : False},
+    "vkGetDeviceQueue2" : {"dispatch": True, "driver" : False, "thunk" : False},
     "vkQueueSubmit" : {"dispatch": True, "driver" : False, "thunk" : False},
 
     # VK_KHR_surface
@@ -2273,8 +2275,9 @@ class VkGenerator(object):
             # Create stubs for unsupported Core functions.
             if func.is_required():
                 # Global functions need a custom implementation, except for
-                # vkCreateInstance, which we can just forward.
-                if func.is_global_func() and func.name != "vkCreateInstance":
+                # vkCreateInstance/vkEnumerateInstanceVersion, which we can forward.
+                if (func.is_global_func() and
+                        func.name not in ["vkCreateInstance", "vkEnumerateInstanceVersion"]):
                     f.write(func.spec())
                 else:
                     f.write(func.spec(symbol="winevulkan.wine_" + func.name))
@@ -2490,10 +2493,6 @@ class VkRegistry(object):
             # different features (e.g. Vulkan 1.1). Parse each require section
             # separately, so we can skip sections we don't want.
             for require in ext.findall("require"):
-                feature = require.attrib.get("feature")
-                if feature == "VK_VERSION_1_1":
-                    continue
-
                 # Extensions can add enum values to Core / extension enums, so add these.
                 for enum_elem in require.findall("enum"):
                     if "bitpos" in enum_elem.keys():
@@ -2544,11 +2543,7 @@ class VkRegistry(object):
     def _parse_features(self, root):
         """ Parse the feature section, which describes Core commands and types needed. """
 
-        # For now limit to 1.0 features as various 1.1 features need more work.
-        # In particular interop extensions promoted to Core.
-        requires = root.findall("./feature/[@name='VK_VERSION_1_0']/require")
-
-        for require in requires:
+        for require in root.findall("./feature/require"):
             LOGGER.info("Including features for {0}".format(require.attrib.get("comment")))
             for tag in require:
                 # Only deal with command. Other values which appear are enum and type for pulling in some

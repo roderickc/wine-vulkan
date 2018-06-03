@@ -40,9 +40,9 @@
 @ stdcall vkAllocateMemory(ptr ptr ptr ptr) winevulkan.wine_vkAllocateMemory
 @ stdcall vkBeginCommandBuffer(ptr ptr) winevulkan.wine_vkBeginCommandBuffer
 @ stdcall vkBindBufferMemory(ptr int64 int64 int64) winevulkan.wine_vkBindBufferMemory
-@ stub vkBindBufferMemory2
+@ stdcall vkBindBufferMemory2(ptr long ptr) winevulkan.wine_vkBindBufferMemory2
 @ stdcall vkBindImageMemory(ptr int64 int64 int64) winevulkan.wine_vkBindImageMemory
-@ stub vkBindImageMemory2
+@ stdcall vkBindImageMemory2(ptr long ptr) winevulkan.wine_vkBindImageMemory2
 @ stdcall vkCmdBeginQuery(ptr int64 long long) winevulkan.wine_vkCmdBeginQuery
 @ stdcall vkCmdBeginRenderPass(ptr ptr long) winevulkan.wine_vkCmdBeginRenderPass
 @ stdcall vkCmdBindDescriptorSets(ptr long int64 long long ptr long ptr) winevulkan.wine_vkCmdBindDescriptorSets
@@ -59,7 +59,7 @@
 @ stdcall vkCmdCopyImageToBuffer(ptr int64 long int64 long ptr) winevulkan.wine_vkCmdCopyImageToBuffer
 @ stdcall vkCmdCopyQueryPoolResults(ptr int64 long long int64 int64 int64 long) winevulkan.wine_vkCmdCopyQueryPoolResults
 @ stdcall vkCmdDispatch(ptr long long long) winevulkan.wine_vkCmdDispatch
-@ stub vkCmdDispatchBase
+@ stdcall vkCmdDispatchBase(ptr long long long long long long) winevulkan.wine_vkCmdDispatchBase
 @ stdcall vkCmdDispatchIndirect(ptr int64 int64) winevulkan.wine_vkCmdDispatchIndirect
 @ stdcall vkCmdDraw(ptr long long long long) winevulkan.wine_vkCmdDraw
 @ stdcall vkCmdDrawIndexed(ptr long long long long long) winevulkan.wine_vkCmdDrawIndexed
@@ -78,7 +78,7 @@
 @ stdcall vkCmdSetBlendConstants(ptr ptr) winevulkan.wine_vkCmdSetBlendConstants
 @ stdcall vkCmdSetDepthBias(ptr float float float) winevulkan.wine_vkCmdSetDepthBias
 @ stdcall vkCmdSetDepthBounds(ptr float float) winevulkan.wine_vkCmdSetDepthBounds
-@ stub vkCmdSetDeviceMask
+@ stdcall vkCmdSetDeviceMask(ptr long) winevulkan.wine_vkCmdSetDeviceMask
 @ stdcall vkCmdSetEvent(ptr int64 long) winevulkan.wine_vkCmdSetEvent
 @ stdcall vkCmdSetLineWidth(ptr float) winevulkan.wine_vkCmdSetLineWidth
 @ stdcall vkCmdSetScissor(ptr long long ptr) winevulkan.wine_vkCmdSetScissor
@@ -95,7 +95,7 @@
 @ stdcall vkCreateComputePipelines(ptr int64 long ptr ptr ptr) winevulkan.wine_vkCreateComputePipelines
 @ stdcall vkCreateDescriptorPool(ptr ptr ptr ptr) winevulkan.wine_vkCreateDescriptorPool
 @ stdcall vkCreateDescriptorSetLayout(ptr ptr ptr ptr) winevulkan.wine_vkCreateDescriptorSetLayout
-@ stub vkCreateDescriptorUpdateTemplate
+@ stdcall vkCreateDescriptorUpdateTemplate(ptr ptr ptr ptr) winevulkan.wine_vkCreateDescriptorUpdateTemplate
 @ stdcall vkCreateDevice(ptr ptr ptr ptr) winevulkan.wine_vkCreateDevice
 @ stub vkCreateDisplayModeKHR
 @ stub vkCreateDisplayPlaneSurfaceKHR
@@ -111,7 +111,7 @@
 @ stdcall vkCreateQueryPool(ptr ptr ptr ptr) winevulkan.wine_vkCreateQueryPool
 @ stdcall vkCreateRenderPass(ptr ptr ptr ptr) winevulkan.wine_vkCreateRenderPass
 @ stdcall vkCreateSampler(ptr ptr ptr ptr) winevulkan.wine_vkCreateSampler
-@ stub vkCreateSamplerYcbcrConversion
+@ stdcall vkCreateSamplerYcbcrConversion(ptr ptr ptr ptr) winevulkan.wine_vkCreateSamplerYcbcrConversion
 @ stdcall vkCreateSemaphore(ptr ptr ptr ptr) winevulkan.wine_vkCreateSemaphore
 @ stdcall vkCreateShaderModule(ptr ptr ptr ptr) winevulkan.wine_vkCreateShaderModule
 @ stub vkCreateSharedSwapchainsKHR
@@ -122,7 +122,7 @@
 @ stdcall vkDestroyCommandPool(ptr int64 ptr) winevulkan.wine_vkDestroyCommandPool
 @ stdcall vkDestroyDescriptorPool(ptr int64 ptr) winevulkan.wine_vkDestroyDescriptorPool
 @ stdcall vkDestroyDescriptorSetLayout(ptr int64 ptr) winevulkan.wine_vkDestroyDescriptorSetLayout
-@ stub vkDestroyDescriptorUpdateTemplate
+@ stdcall vkDestroyDescriptorUpdateTemplate(ptr int64 ptr) winevulkan.wine_vkDestroyDescriptorUpdateTemplate
 @ stdcall vkDestroyDevice(ptr ptr) winevulkan.wine_vkDestroyDevice
 @ stdcall vkDestroyEvent(ptr int64 ptr) winevulkan.wine_vkDestroyEvent
 @ stdcall vkDestroyFence(ptr int64 ptr) winevulkan.wine_vkDestroyFence
@@ -136,7 +136,7 @@
 @ stdcall vkDestroyQueryPool(ptr int64 ptr) winevulkan.wine_vkDestroyQueryPool
 @ stdcall vkDestroyRenderPass(ptr int64 ptr) winevulkan.wine_vkDestroyRenderPass
 @ stdcall vkDestroySampler(ptr int64 ptr) winevulkan.wine_vkDestroySampler
-@ stub vkDestroySamplerYcbcrConversion
+@ stdcall vkDestroySamplerYcbcrConversion(ptr int64 ptr) winevulkan.wine_vkDestroySamplerYcbcrConversion
 @ stdcall vkDestroySemaphore(ptr int64 ptr) winevulkan.wine_vkDestroySemaphore
 @ stdcall vkDestroyShaderModule(ptr int64 ptr) winevulkan.wine_vkDestroyShaderModule
 @ stdcall vkDestroySurfaceKHR(ptr int64 ptr) winevulkan.wine_vkDestroySurfaceKHR
@@ -147,51 +147,51 @@
 @ stdcall vkEnumerateDeviceLayerProperties(ptr ptr ptr) winevulkan.wine_vkEnumerateDeviceLayerProperties
 @ stdcall vkEnumerateInstanceExtensionProperties(str ptr ptr)
 @ stdcall vkEnumerateInstanceLayerProperties(ptr ptr)
-@ stub vkEnumerateInstanceVersion
-@ stub vkEnumeratePhysicalDeviceGroups
+@ stdcall vkEnumerateInstanceVersion(ptr) winevulkan.wine_vkEnumerateInstanceVersion
+@ stdcall vkEnumeratePhysicalDeviceGroups(ptr ptr ptr) winevulkan.wine_vkEnumeratePhysicalDeviceGroups
 @ stdcall vkEnumeratePhysicalDevices(ptr ptr ptr) winevulkan.wine_vkEnumeratePhysicalDevices
 @ stdcall vkFlushMappedMemoryRanges(ptr long ptr) winevulkan.wine_vkFlushMappedMemoryRanges
 @ stdcall vkFreeCommandBuffers(ptr int64 long ptr) winevulkan.wine_vkFreeCommandBuffers
 @ stdcall vkFreeDescriptorSets(ptr int64 long ptr) winevulkan.wine_vkFreeDescriptorSets
 @ stdcall vkFreeMemory(ptr int64 ptr) winevulkan.wine_vkFreeMemory
 @ stdcall vkGetBufferMemoryRequirements(ptr int64 ptr) winevulkan.wine_vkGetBufferMemoryRequirements
-@ stub vkGetBufferMemoryRequirements2
-@ stub vkGetDescriptorSetLayoutSupport
-@ stub vkGetDeviceGroupPeerMemoryFeatures
+@ stdcall vkGetBufferMemoryRequirements2(ptr ptr ptr) winevulkan.wine_vkGetBufferMemoryRequirements2
+@ stdcall vkGetDescriptorSetLayoutSupport(ptr ptr ptr) winevulkan.wine_vkGetDescriptorSetLayoutSupport
+@ stdcall vkGetDeviceGroupPeerMemoryFeatures(ptr long long long long) winevulkan.wine_vkGetDeviceGroupPeerMemoryFeatures
 @ stdcall vkGetDeviceMemoryCommitment(ptr int64 ptr) winevulkan.wine_vkGetDeviceMemoryCommitment
 @ stdcall vkGetDeviceProcAddr(ptr str) winevulkan.wine_vkGetDeviceProcAddr
 @ stdcall vkGetDeviceQueue(ptr long long ptr) winevulkan.wine_vkGetDeviceQueue
-@ stub vkGetDeviceQueue2
+@ stdcall vkGetDeviceQueue2(ptr ptr ptr) winevulkan.wine_vkGetDeviceQueue2
 @ stub vkGetDisplayModePropertiesKHR
 @ stub vkGetDisplayPlaneCapabilitiesKHR
 @ stub vkGetDisplayPlaneSupportedDisplaysKHR
 @ stdcall vkGetEventStatus(ptr int64) winevulkan.wine_vkGetEventStatus
 @ stdcall vkGetFenceStatus(ptr int64) winevulkan.wine_vkGetFenceStatus
 @ stdcall vkGetImageMemoryRequirements(ptr int64 ptr) winevulkan.wine_vkGetImageMemoryRequirements
-@ stub vkGetImageMemoryRequirements2
+@ stdcall vkGetImageMemoryRequirements2(ptr ptr ptr) winevulkan.wine_vkGetImageMemoryRequirements2
 @ stdcall vkGetImageSparseMemoryRequirements(ptr int64 ptr ptr) winevulkan.wine_vkGetImageSparseMemoryRequirements
-@ stub vkGetImageSparseMemoryRequirements2
+@ stdcall vkGetImageSparseMemoryRequirements2(ptr ptr ptr ptr) winevulkan.wine_vkGetImageSparseMemoryRequirements2
 @ stdcall vkGetImageSubresourceLayout(ptr int64 ptr ptr) winevulkan.wine_vkGetImageSubresourceLayout
 @ stdcall vkGetInstanceProcAddr(ptr str)
 @ stub vkGetPhysicalDeviceDisplayPlanePropertiesKHR
 @ stub vkGetPhysicalDeviceDisplayPropertiesKHR
-@ stub vkGetPhysicalDeviceExternalBufferProperties
-@ stub vkGetPhysicalDeviceExternalFenceProperties
-@ stub vkGetPhysicalDeviceExternalSemaphoreProperties
+@ stdcall vkGetPhysicalDeviceExternalBufferProperties(ptr ptr ptr) winevulkan.wine_vkGetPhysicalDeviceExternalBufferProperties
+@ stdcall vkGetPhysicalDeviceExternalFenceProperties(ptr ptr ptr) winevulkan.wine_vkGetPhysicalDeviceExternalFenceProperties
+@ stdcall vkGetPhysicalDeviceExternalSemaphoreProperties(ptr ptr ptr) winevulkan.wine_vkGetPhysicalDeviceExternalSemaphoreProperties
 @ stdcall vkGetPhysicalDeviceFeatures(ptr ptr) winevulkan.wine_vkGetPhysicalDeviceFeatures
-@ stub vkGetPhysicalDeviceFeatures2
+@ stdcall vkGetPhysicalDeviceFeatures2(ptr ptr) winevulkan.wine_vkGetPhysicalDeviceFeatures2
 @ stdcall vkGetPhysicalDeviceFormatProperties(ptr long ptr) winevulkan.wine_vkGetPhysicalDeviceFormatProperties
-@ stub vkGetPhysicalDeviceFormatProperties2
+@ stdcall vkGetPhysicalDeviceFormatProperties2(ptr long ptr) winevulkan.wine_vkGetPhysicalDeviceFormatProperties2
 @ stdcall vkGetPhysicalDeviceImageFormatProperties(ptr long long long long long ptr) winevulkan.wine_vkGetPhysicalDeviceImageFormatProperties
-@ stub vkGetPhysicalDeviceImageFormatProperties2
+@ stdcall vkGetPhysicalDeviceImageFormatProperties2(ptr ptr ptr) winevulkan.wine_vkGetPhysicalDeviceImageFormatProperties2
 @ stdcall vkGetPhysicalDeviceMemoryProperties(ptr ptr) winevulkan.wine_vkGetPhysicalDeviceMemoryProperties
-@ stub vkGetPhysicalDeviceMemoryProperties2
+@ stdcall vkGetPhysicalDeviceMemoryProperties2(ptr ptr) winevulkan.wine_vkGetPhysicalDeviceMemoryProperties2
 @ stdcall vkGetPhysicalDeviceProperties(ptr ptr) winevulkan.wine_vkGetPhysicalDeviceProperties
-@ stub vkGetPhysicalDeviceProperties2
+@ stdcall vkGetPhysicalDeviceProperties2(ptr ptr) winevulkan.wine_vkGetPhysicalDeviceProperties2
 @ stdcall vkGetPhysicalDeviceQueueFamilyProperties(ptr ptr ptr) winevulkan.wine_vkGetPhysicalDeviceQueueFamilyProperties
-@ stub vkGetPhysicalDeviceQueueFamilyProperties2
+@ stdcall vkGetPhysicalDeviceQueueFamilyProperties2(ptr ptr ptr) winevulkan.wine_vkGetPhysicalDeviceQueueFamilyProperties2
 @ stdcall vkGetPhysicalDeviceSparseImageFormatProperties(ptr long long long long long ptr ptr) winevulkan.wine_vkGetPhysicalDeviceSparseImageFormatProperties
-@ stub vkGetPhysicalDeviceSparseImageFormatProperties2
+@ stdcall vkGetPhysicalDeviceSparseImageFormatProperties2(ptr ptr ptr ptr) winevulkan.wine_vkGetPhysicalDeviceSparseImageFormatProperties2
 @ stdcall vkGetPhysicalDeviceSurfaceCapabilitiesKHR(ptr int64 ptr) winevulkan.wine_vkGetPhysicalDeviceSurfaceCapabilitiesKHR
 @ stdcall vkGetPhysicalDeviceSurfaceFormatsKHR(ptr int64 ptr ptr) winevulkan.wine_vkGetPhysicalDeviceSurfaceFormatsKHR
 @ stdcall vkGetPhysicalDeviceSurfacePresentModesKHR(ptr int64 ptr long) winevulkan.wine_vkGetPhysicalDeviceSurfacePresentModesKHR
@@ -214,8 +214,8 @@
 @ stdcall vkResetEvent(ptr int64) winevulkan.wine_vkResetEvent
 @ stdcall vkResetFences(ptr long ptr) winevulkan.wine_vkResetFences
 @ stdcall vkSetEvent(ptr int64) winevulkan.wine_vkSetEvent
-@ stub vkTrimCommandPool
+@ stdcall vkTrimCommandPool(ptr int64 long) winevulkan.wine_vkTrimCommandPool
 @ stdcall vkUnmapMemory(ptr int64) winevulkan.wine_vkUnmapMemory
-@ stub vkUpdateDescriptorSetWithTemplate
+@ stdcall vkUpdateDescriptorSetWithTemplate(ptr int64 int64 ptr) winevulkan.wine_vkUpdateDescriptorSetWithTemplate
 @ stdcall vkUpdateDescriptorSets(ptr long ptr long ptr) winevulkan.wine_vkUpdateDescriptorSets
 @ stdcall vkWaitForFences(ptr long ptr long int64) winevulkan.wine_vkWaitForFences
