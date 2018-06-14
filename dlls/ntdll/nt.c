@@ -1322,17 +1322,16 @@ static inline BOOL logical_proc_info_add_by_id(SYSTEM_LOGICAL_PROCESSOR_INFORMAT
     if (pdata) {
         DWORD i;
 
-        if(rel == RelationProcessorPackage){
-            for(i=0; i<*len; i++)
+        for(i=0; i<*len; i++)
+        {
+            if (rel == RelationProcessorPackage && (*pdata)[i].Relationship == rel && (*pdata)[i].u.Reserved[1] == id)
             {
-                if ((*pdata)[i].Relationship!=rel || (*pdata)[i].u.Reserved[1]!=id)
-                    continue;
-
                 (*pdata)[i].ProcessorMask |= mask;
                 return TRUE;
             }
-        }else
-            i = *len;
+            else if (rel == RelationProcessorCore && (*pdata)[i].Relationship == rel && (*pdata)[i].u.Reserved[1] == id)
+                return TRUE;
+        }
 
         while(*len == *pmax_len)
         {
@@ -1356,6 +1355,10 @@ static inline BOOL logical_proc_info_add_by_id(SYSTEM_LOGICAL_PROCESSOR_INFORMAT
             if (rel == RelationProcessorPackage && dataex->Relationship == rel && dataex->u.Processor.Reserved[1] == id)
             {
                 dataex->u.Processor.GroupMask[0].Mask |= mask;
+                return TRUE;
+            }
+            else if (rel == RelationProcessorCore && dataex->Relationship == rel && dataex->u.Processor.Reserved[1] == id)
+            {
                 return TRUE;
             }
             ofs += dataex->Size;
@@ -1554,6 +1557,9 @@ static NTSTATUS create_logical_proc_info(SYSTEM_LOGICAL_PROCESSOR_INFORMATION **
 
         for(i=beg; i<=end; i++)
         {
+            DWORD phys_core = 0;
+            ULONG_PTR thread_mask = 0;
+
             if(i > 8*sizeof(ULONG_PTR))
             {
                 FIXME("skipping logical processor %d\n", i);
@@ -1574,15 +1580,31 @@ static NTSTATUS create_logical_proc_info(SYSTEM_LOGICAL_PROCESSOR_INFORMATION **
                 return STATUS_NO_MEMORY;
             }
 
-            sprintf(name, core_info, i, "core_id");
+            /* Thread_siblings_list provides logical cores sharing the same physical core.
+             * The IDs are based on kernel cpu core numbering as opposed to a hardware core
+             * ID like provided through 'core_id'. This allows us to use the first element
+             * as a unique ID for a physical core.
+             */
+            sprintf(name, core_info, i, "thread_siblings_list");
             f = fopen(name, "r");
             if(f)
             {
-                fscanf(f, "%u", &r);
+                fscanf(f, "%d%c", &phys_core, &op);
                 fclose(f);
             }
-            else r = i;
-            if(!logical_proc_info_add_by_id(data, dataex, &len, max_len, RelationProcessorCore, r, (ULONG_PTR)1 << i))
+            else phys_core = i;
+
+            /* Mask of logical threads sharing same physical core in kernel core numbering. */
+            sprintf(name, core_info, i, "thread_siblings");
+            f = fopen(name, "r");
+            if(f)
+            {
+//TODO: add common helper, which can also parse shared_cpu_map.
+                fscanf(f, "%lx", &thread_mask);
+                fclose(f);
+            }
+            else thread_mask = 1<<i;
+            if(!logical_proc_info_add_by_id(data, dataex, &len, max_len, RelationProcessorCore, phys_core, thread_mask))
             {
                 fclose(fcpu_list);
                 return STATUS_NO_MEMORY;
