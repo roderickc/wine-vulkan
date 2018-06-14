@@ -1309,6 +1309,17 @@ static DWORD log_proc_ex_size_plus(DWORD size)
     return sizeof(LOGICAL_PROCESSOR_RELATIONSHIP) + sizeof(DWORD) + size;
 }
 
+static DWORD count_bits(ULONG_PTR mask)
+{
+    DWORD count = 0;
+    while (mask > 0)
+    {
+        mask >>= 1;
+        count++;
+    }
+    return count;
+}
+
 /* Store package and core information for a logical processor. Parsing of processor
  * data may happen in multiple passes; the 'id' parameter is then used to locate
  * previously stored data. The type of data stored in 'id' depends on 'rel':
@@ -1377,7 +1388,10 @@ static inline BOOL logical_proc_info_add_by_id(SYSTEM_LOGICAL_PROCESSOR_INFORMAT
 
         dataex->Relationship = rel;
         dataex->Size = log_proc_ex_size_plus(sizeof(PROCESSOR_RELATIONSHIP));
-        dataex->u.Processor.Flags = 0; /* TODO */
+        if (rel == RelationProcessorCore)
+            dataex->u.Processor.Flags = count_bits(mask) > 1 ? LTP_PC_SMT : 0;
+        else
+            dataex->u.Processor.Flags = 0;
         dataex->u.Processor.EfficiencyClass = 0;
         dataex->u.Processor.GroupCount = 1;
         dataex->u.Processor.GroupMask[0].Mask = mask;
@@ -1520,17 +1534,6 @@ static inline BOOL logical_proc_info_add_group(SYSTEM_LOGICAL_PROCESSOR_INFORMAT
 }
 
 #ifdef linux
-static DWORD count_bits(ULONG_PTR mask)
-{
-    DWORD count = 0;
-    while (mask > 0)
-    {
-        mask >>= 1;
-        count++;
-    }
-    return count;
-}
-
 /* for 'data', max_len is the array count. for 'dataex', max_len is in bytes */
 static NTSTATUS create_logical_proc_info(SYSTEM_LOGICAL_PROCESSOR_INFORMATION **data,
         SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX **dataex, DWORD *max_len)
