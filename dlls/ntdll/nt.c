@@ -1511,6 +1511,17 @@ static inline BOOL logical_proc_info_add_group(SYSTEM_LOGICAL_PROCESSOR_INFORMAT
 }
 
 #ifdef linux
+static DWORD count_bits(ULONG_PTR mask)
+{
+    DWORD count = 0;
+    while (mask > 0)
+    {
+        mask >>= 1;
+        count++;
+    }
+    return count;
+}
+
 /* for 'data', max_len is the array count. for 'dataex', max_len is in bytes */
 static NTSTATUS create_logical_proc_info(SYSTEM_LOGICAL_PROCESSOR_INFORMATION **data,
         SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX **dataex, DWORD *max_len)
@@ -1643,7 +1654,6 @@ static NTSTATUS create_logical_proc_info(SYSTEM_LOGICAL_PROCESSOR_INFORMATION **
         for(i=0; i<len; i++){
             if((*data)[i].Relationship == RelationProcessorCore){
                 all_cpus_mask |= (*data)[i].ProcessorMask;
-                ++num_cpus;
             }
         }
     }else{
@@ -1651,11 +1661,11 @@ static NTSTATUS create_logical_proc_info(SYSTEM_LOGICAL_PROCESSOR_INFORMATION **
             SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX *infoex = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX *)(((char *)*dataex) + i);
             if(infoex->Relationship == RelationProcessorCore){
                 all_cpus_mask |= infoex->u.Processor.GroupMask[0].Mask;
-                ++num_cpus;
             }
             i += infoex->Size;
         }
     }
+    num_cpus = count_bits(all_cpus_mask);
 
     fnuma_list = fopen("/sys/devices/system/node/online", "r");
     if(!fnuma_list)
